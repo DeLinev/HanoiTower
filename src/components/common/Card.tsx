@@ -2,7 +2,7 @@ import type { CardType } from "../../types/ui.types";
 
 export function Card({ children, Icon, title } : CardType) {
     return (
-        <div className="flex flex-col items-center justify-center flex-1 gap-4 p-4">
+        <div className="flex flex-col items-center justify-start flex-1 gap-4 p-4">
             {
                 (Icon || title) &&
                 <div className="flex items-center gap-1">

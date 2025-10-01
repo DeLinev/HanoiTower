@@ -4,11 +4,12 @@ import { Tower } from "./Tower";
 export function HanoiGame({ gameState }: { gameState: GameState }) {
     return (
         <div className="w-full p-8">
-            <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto border-1 border-gray-500 rounded-xl">
+            <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">
                 {gameState.towers.map((tower) => (
                     <Tower key={tower.id} tower={tower} />
                 ))}
             </div>
+            <div className="w-full h-4 bg-gray-400 rounded-lg max-w-4xl mx-auto"></div>
         </div>
     )
 }
