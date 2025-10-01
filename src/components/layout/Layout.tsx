@@ -38,7 +38,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 </div>
             </header>
 
-            <main className="flex-1 flex">
+            <main className="flex-1 flex flex-col">
                 {children}
             </main>
         </div>

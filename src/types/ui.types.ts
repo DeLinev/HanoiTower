@@ -1,7 +1,14 @@
-import type { Difficulty, DifficultyLevel } from "./game.types"
+import type { ElementType, ReactNode } from "react"
+import type { Difficulty } from "./game.types"
 
 export type DifficultyType = {
     diff: Difficulty,
-    setSelectedDifficulty: (selectedDifficulty: DifficultyLevel) => void,
-    selectedDifficulty: DifficultyLevel
+    setSelectedDifficulty: (selectedDifficulty: Difficulty) => void,
+    selectedDifficulty: Difficulty
+}
+
+export type CardType = {
+    children: ReactNode, 
+    Icon?: ElementType, 
+    title?: string
 }

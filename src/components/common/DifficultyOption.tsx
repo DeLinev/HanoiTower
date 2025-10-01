@@ -4,10 +4,10 @@ export function DifficultyOption({ diff, setSelectedDifficulty, selectedDifficul
     return (
     <div
         key={diff.value}
-        onClick={() => setSelectedDifficulty(diff.value)}
+        onClick={() => setSelectedDifficulty(diff)}
         className={`
             p-4 rounded-lg border-2 cursor-pointer transition-all duration-300 ease-in-out
-            ${selectedDifficulty === diff.value
+            ${selectedDifficulty.value === diff.value
                 ? 'border-gray-600 bg-blue-50'
                 : 'border-gray-200 hover:border-gray-300'}
         `}>
@@ -15,7 +15,7 @@ export function DifficultyOption({ diff, setSelectedDifficulty, selectedDifficul
             <div>
                 <h3 className={`
                     text-xl font-semibol font-bold duration-300
-                    ${selectedDifficulty === diff.value
+                    ${selectedDifficulty.value === diff.value
                         ? 'text-gray-800'
                         : 'text-gray-300'}
                 `}>
@@ -23,7 +23,7 @@ export function DifficultyOption({ diff, setSelectedDifficulty, selectedDifficul
                 </h3>
                 <p className={`
                     text-gray-400 text-sm font-bold mt-1 transition-opacity duration-300 overflow-hidden
-                    ${selectedDifficulty === diff.value
+                    ${selectedDifficulty.value === diff.value
                         ? 'max-h-8 opacity-100'
                         : 'max-h-0 opacity-0'}
                 `}>
