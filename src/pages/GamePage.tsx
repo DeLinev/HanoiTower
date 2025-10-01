@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { Difficulty, Disk, GameState } from "../types/game.types";
 import { Layout } from "../components/layout/Layout";
 import { GameControls } from "../components/game/GameControls";
+import { HanoiGame } from "../components/game/HanoiGame";
 
 export function GamePage({ difficulty }: { difficulty: Difficulty }) {
     const disksPlaceholder: Disk[] = Array.from({ length: difficulty.disks }, (_, i) => ({
@@ -21,14 +22,14 @@ export function GamePage({ difficulty }: { difficulty: Difficulty }) {
         timePassed: 0
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [gameState, setGameState] = useState<GameState>(gameStatePlaceholder);
 
     return (
         <Layout>
             <GameControls gameState={gameState} />
-            <div className="mt-100">
-                d
-            </div>
+            
+            <HanoiGame gameState={gameState}/>
         </Layout>
     )
 }
