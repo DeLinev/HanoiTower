@@ -13,28 +13,22 @@ export function StartPage({ onGameStart }: { onGameStart: (selectedDifficulty: D
     return (
         <>
             <Layout>
-                {/* <div className="flex flex-col items-center justify-center flex-1 gap-4 p-4">
-                    <div className="flex items-center gap-1">
-                        <Cog6ToothIcon className="text-gray-300 w-8 h-8" />
-                        <h1 className="font-serif text-3xl">Game Settings</h1>
-                    </div> */}
-                    <Card Icon={Cog6ToothIcon} title="Game Settings">
-                        <h2 className="text-center font-bold text-xl">Choose difficulty</h2>
-                        <div className="grid gap-4">
-                            {difficulties.map((diff) => (
-                                <DifficultyOption key={diff.disks} diff={diff} setSelectedDifficulty={setSelectedDifficulty} selectedDifficulty={selectedDifficulty} />
-                            ))}
-                        </div>
-                        <Button
-                            onClick={() => onGameStart(selectedDifficulty)}
-                            variant="primary"
-                            size="large"
-                            fullWidth
-                        >
-                            Start Game
-                        </Button>
-                    </Card>
-                {/* </div> */}
+                <Card Icon={Cog6ToothIcon} title="Game Settings">
+                    <h2 className="text-center font-bold text-xl">Choose difficulty</h2>
+                    <div className="grid gap-4">
+                        {difficulties.map((diff) => (
+                            <DifficultyOption key={diff.disks} diff={diff} setSelectedDifficulty={setSelectedDifficulty} selectedDifficulty={selectedDifficulty} />
+                        ))}
+                    </div>
+                    <Button
+                        onClick={() => onGameStart(selectedDifficulty)}
+                        variant="primary"
+                        size="large"
+                        fullWidth
+                    >
+                        Start Game
+                    </Button>
+                </Card>
             </Layout>
         </>
     )
