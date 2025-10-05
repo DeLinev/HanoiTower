@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { useState } from "react";
-import Logo from "../assets/logo.svg";
+import Logo from "../../assets/logo.svg"
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
 
 export function Layout({ children }: { children: ReactNode }) {
@@ -38,7 +38,7 @@ export function Layout({ children }: { children: ReactNode }) {
                 </div>
             </header>
 
-            <main className="flex-1 flex">
+            <main className="flex-1 flex flex-col">
                 {children}
             </main>
         </div>

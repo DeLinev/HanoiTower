@@ -9,14 +9,14 @@ interface ButtonProps {
   fullWidth?: boolean;
 }
 
-export const Button: React.FC<ButtonProps> = ({
+export function Button ({
   children,
   onClick,
   variant = 'primary',
   size = 'medium',
   disabled = false,
   fullWidth = false,
-}) => {
+} : ButtonProps) {
   const baseStyles = 'font-semibold rounded-lg transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variantStyles = {
