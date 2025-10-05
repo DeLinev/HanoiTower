@@ -4,7 +4,6 @@ export function Disk({ disk }: { disk: Disk }) {
     const width = 20 + (disk.size * 10);
     console.log(`w-${width}`)
 
-    // Кольори для різних розмірів дисків
     const colors = [
         'bg-red-500',
         'bg-orange-500',

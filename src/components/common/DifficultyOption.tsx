@@ -1,6 +1,6 @@
-import type { DifficultyType } from "../../types/ui.types";
+import type { DifficultyProps } from "../../types/ui.types";
 
-export function DifficultyOption({ diff, setSelectedDifficulty, selectedDifficulty }: DifficultyType) {
+export function DifficultyOption({ diff, setSelectedDifficulty, selectedDifficulty }: DifficultyProps) {
     return (
     <div
         key={diff.value}

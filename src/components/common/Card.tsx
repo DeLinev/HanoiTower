@@ -1,6 +1,6 @@
-import type { CardType } from "../../types/ui.types";
+import type { CardProps } from "../../types/ui.types";
 
-export function Card({ children, Icon, title } : CardType) {
+export function Card({ children, Icon, title } : CardProps) {
     return (
         <div className="flex flex-col items-center justify-start flex-1 gap-4 p-4">
             {
