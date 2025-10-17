@@ -1,5 +1,5 @@
 import type { ElementType, ReactNode } from "react"
-import type { Difficulty, GameState } from "./game.types"
+import type { Difficulty, GameState, GameStatistic } from "./game.types"
 
 export type DifficultyProps = {
     diff: Difficulty,
@@ -25,10 +25,9 @@ export type StatCardProps = {
 }
 
 export type ResultsPageProps = {
-    movesCount: number,
-    timePassed: number,
-    minMoves: number,
-    gameState: GameState
+    gameStatistic: GameStatistic,
+    onPlayAgain: () => void,
+    onMainMenu: () => void
 }
 
 export type GamePageProps = {

@@ -24,3 +24,11 @@ export type GameState = {
     difficulty: Difficulty,
     selectedTower: number | null,
 }
+
+export type GameStatistic = {
+    movesCount: number,
+    timePassed: number,
+    difficulty: Difficulty,
+    minMoves: number,
+    efficiency: number
+} 
