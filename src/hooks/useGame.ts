@@ -8,13 +8,14 @@ import { useTowerSelection } from "./useTowerSelection";
 
 export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, timePassed: number) => void) {
     const validation = useGameValidation();
-    const timer = useTimer();
+    const timer = useTimer(true); // Auto-start the timer
     const selection = useTowerSelection();
     const movement = useDiskMovement();
 
     const diskCount = difficulties.find(diff => diff.label === difficulty.label)!.disks;
 
     const initializeGame = (): GameState => {
+
         const disks: Disk[] = Array.from({ length: diskCount }, (_, i) => ({
             id: i,
             size: diskCount - i,
@@ -36,11 +37,7 @@ export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, 
     const [gameState, setGameState] = useState<GameState>(initializeGame());
 
     const handleTowerSelect = (towerId: number) => {
-        if (gameState.isGameWon) return;
-
-        if (gameState.movesCount === 0 && !timer.isRunning) {
-            timer.start();
-        }
+        if (gameState.isGameWon || !timer.isRunning) return;
 
         const selectedTower = gameState.towers.find(t => t.id === towerId);
 
@@ -99,6 +96,7 @@ export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, 
     const resetGame = () => {
         setGameState(initializeGame());
         timer.reset();
+        timer.start();
         selection.deselectTower();
     };
 

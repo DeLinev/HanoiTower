@@ -11,7 +11,7 @@ function canMoveDisk(fromT: Tower, toT: Tower) {
     const movingDisk = fromT.disks.at(-1);
     const targetDisk = toT.disks.at(-1);
 
-    return targetDisk!.size < movingDisk!.size;
+    return targetDisk!.size > movingDisk!.size;
 }
 
 function checkWin(towers: Tower[], maxDiskCount: number) {

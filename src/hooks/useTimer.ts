@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react"
 
-export function useTimer() {
+export function useTimer(autoStart: boolean = false) {
     const [timePassed, setTimePassed] = useState(0);
-    const [isRunning, setIsRunning] = useState(false);
+    const [isRunning, setIsRunning] = useState(autoStart);
     const intervalIdRef = useRef<number | null>(null);
 
     const start = () => { setIsRunning(true) };

@@ -8,8 +8,8 @@ export type DifficultyProps = {
 }
 
 export type CardProps = {
-    children: ReactNode, 
-    Icon?: ElementType, 
+    children: ReactNode,
+    Icon?: ElementType,
     title?: string
 }
 
@@ -24,9 +24,30 @@ export type StatCardProps = {
     color: 'orange' | 'indigo' | 'green' | 'blue' | 'red';
 }
 
-export type ResultsPageProps = { 
+export type ResultsPageProps = {
+    movesCount: number,
+    timePassed: number,
+    minMoves: number,
+    gameState: GameState
+}
+
+export type GamePageProps = {
+    difficulty: Difficulty,
+    onQuit: () => void,
+    onGameWin: (movesCount: number, timePassed: number) => void
+}
+
+export type GameControlsProps = {
     movesCount: number, 
     timePassed: number, 
-    minMoves: number, 
-    gameState: GameState
+    isTimerRunning: boolean,
+    onReset: () => void, 
+    onPause: () => void, 
+    onResume: () => void, 
+    onQuite: () => void
+}
+
+export type HanoiGameProps = { 
+    gameState: GameState, 
+    onTowerSelect: (towerId: number) => void
 }

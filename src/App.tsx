@@ -25,7 +25,7 @@ function App() {
       )}
 
       {currentPage === 'game' && (
-        <GamePage difficulty={difficulty} />
+        <GamePage difficulty={difficulty} onGameWin={() => console.log('Win!')} onQuit={() => setCurrentPage('start')} />
       )}
 
       {currentPage === 'results' && (
