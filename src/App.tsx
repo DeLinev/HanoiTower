@@ -29,7 +29,11 @@ function App() {
       )}
 
       {currentPage === 'results' && (
-        <ResultsPage gameState={gameStatePlaceholder} />
+        <ResultsPage 
+          movesCount={gameStatePlaceholder.movesCount} 
+          timePassed={199} minMoves={gameStatePlaceholder.movesCount} 
+          gameState={gameStatePlaceholder} 
+        />
       )}
     </>
   )

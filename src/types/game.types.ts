@@ -22,5 +22,5 @@ export type GameState = {
     movesCount: number,
     isGameWon: boolean,
     difficulty: Difficulty,
-    timePassed: number
+    selectedTower: number | null,
 }

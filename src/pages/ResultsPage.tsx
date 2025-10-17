@@ -4,12 +4,11 @@ import { StatCard } from "../components/common/StatCard";
 import { InfoRow } from "../components/common/InfoRow";
 import { AchievementMessage } from "../components/common/AchievementMessage";
 import { Layout } from "../components/layout/Layout";
-import type { GameState } from "../types/game.types";
 import { formatTime } from "../utils/format.utils";
+import type { ResultsPageProps } from "../types/ui.types";
 
-export function ResultsPage({ gameState }: { gameState: GameState }) {
-    const minMoves = Math.pow(2, gameState.difficulty.disks) - 1;
-    const efficiency = Math.round((minMoves / gameState.movesCount) * 100);
+export function ResultsPage({ movesCount, timePassed, minMoves, gameState }: ResultsPageProps) {
+    const efficiency = Math.round((minMoves / movesCount) * 100);
 
     return (
         <Layout>
@@ -19,13 +18,13 @@ export function ResultsPage({ gameState }: { gameState: GameState }) {
 
                     <div className="grid grid-cols-2 gap-4 mb-3">
                         <StatCard 
-                            value={gameState.movesCount}
+                            value={movesCount}
                             label="Number of Moves"
                             color="orange"
                         />
 
                         <StatCard 
-                            value={formatTime(gameState.timePassed)}
+                            value={formatTime(timePassed)}
                             label="Time"
                             color="indigo"
                         />

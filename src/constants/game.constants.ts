@@ -20,5 +20,5 @@ export const gameStatePlaceholder: GameState = {
     movesCount: 15,
     isGameWon: false,
     difficulty: difficulties[1],
-    timePassed: 1000
+    selectedTower: null
 }

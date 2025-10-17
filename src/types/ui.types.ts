@@ -1,5 +1,5 @@
 import type { ElementType, ReactNode } from "react"
-import type { Difficulty } from "./game.types"
+import type { Difficulty, GameState } from "./game.types"
 
 export type DifficultyProps = {
     diff: Difficulty,
@@ -22,4 +22,11 @@ export type StatCardProps = {
     value: string | number;
     label: string;
     color: 'orange' | 'indigo' | 'green' | 'blue' | 'red';
+}
+
+export type ResultsPageProps = { 
+    movesCount: number, 
+    timePassed: number, 
+    minMoves: number, 
+    gameState: GameState
 }
