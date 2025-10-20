@@ -2,7 +2,6 @@ import type { Disk } from "../../types/game.types";
 
 export function Disk({ disk }: { disk: Disk }) {
     const width = 20 + (disk.size * 10);
-    console.log(`w-${width}`)
 
     const colors = [
         'bg-red-500',

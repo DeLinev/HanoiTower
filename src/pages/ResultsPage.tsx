@@ -4,13 +4,10 @@ import { StatCard } from "../components/common/StatCard";
 import { InfoRow } from "../components/common/InfoRow";
 import { AchievementMessage } from "../components/common/AchievementMessage";
 import { Layout } from "../components/layout/Layout";
-import type { GameState } from "../types/game.types";
 import { formatTime } from "../utils/format.utils";
+import type { ResultsPageProps } from "../types/ui.types";
 
-export function ResultsPage({ gameState }: { gameState: GameState }) {
-    const minMoves = Math.pow(2, gameState.difficulty.disks) - 1;
-    const efficiency = Math.round((minMoves / gameState.movesCount) * 100);
-
+export function ResultsPage({ gameStatistic, onPlayAgain, onMainMenu }: ResultsPageProps) {
     return (
         <Layout>
             <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8">
@@ -19,13 +16,13 @@ export function ResultsPage({ gameState }: { gameState: GameState }) {
 
                     <div className="grid grid-cols-2 gap-4 mb-3">
                         <StatCard 
-                            value={gameState.movesCount}
+                            value={gameStatistic.movesCount}
                             label="Number of Moves"
                             color="orange"
                         />
 
                         <StatCard 
-                            value={formatTime(gameState.timePassed)}
+                            value={formatTime(gameStatistic.timePassed)}
                             label="Time"
                             color="indigo"
                         />
@@ -34,31 +31,32 @@ export function ResultsPage({ gameState }: { gameState: GameState }) {
                     <div className="space-y-1 mb-3">
                         <InfoRow 
                             label="Difficulty"
-                            value={gameState.difficulty.label}
+                            value={gameStatistic.difficulty.label}
                         />
 
                         <InfoRow 
                             label="Minimum number of moves"
-                            value={minMoves}
+                            value={gameStatistic.minMoves}
                         />
 
                         <InfoRow 
                             label="Efficiency"
                             value={
-                                <span className={`font-semibold ${efficiency >= 100 ? 'text-green-600' : 'text-orange-600'}`}>
-                                    {efficiency}%
+                                <span className={`font-semibold ${gameStatistic.efficiency >= 100 ? 'text-green-600' : 'text-orange-600'}`}>
+                                    {gameStatistic.efficiency}%
                                 </span>
                             }
                         />
                     </div>
 
-                    <AchievementMessage efficiency={efficiency} />
+                    <AchievementMessage efficiency={gameStatistic.efficiency} />
 
                     <div className="flex gap-3">
                         <Button
                             variant="primary"
                             size="large"
                             fullWidth
+                            onClick={onPlayAgain}
                         >
                             Play again
                         </Button>
@@ -66,6 +64,7 @@ export function ResultsPage({ gameState }: { gameState: GameState }) {
                             variant="secondary"
                             size="large"
                             fullWidth
+                            onClick={onMainMenu}
                         >
                             Main menu
                         </Button>

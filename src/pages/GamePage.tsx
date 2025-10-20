@@ -1,35 +1,38 @@
-import { useState } from "react";
-import type { Difficulty, Disk, GameState } from "../types/game.types";
 import { Layout } from "../components/layout/Layout";
 import { GameControls } from "../components/game/GameControls";
 import { HanoiGame } from "../components/game/HanoiGame";
+import type { GamePageProps } from "../types/ui.types";
+import { useGame } from "../hooks/useGame";
+import { useEffect } from "react";
 
-export function GamePage({ difficulty }: { difficulty: Difficulty }) {
-    const disksPlaceholder: Disk[] = Array.from({ length: difficulty.disks }, (_, i) => ({
-      id: i,
-      size: (difficulty.disks - i),
-    }));
+export function GamePage({ difficulty, onQuit, onGameWin }: GamePageProps) {
+    const {
+        gameState,
+        timePassed,
+        handleTowerSelect,
+        isTimerRunning,
+        resetGame,
+        pauseGame,
+        resumeGame,
+    } = useGame(difficulty, onGameWin);
 
-    const gameStatePlaceholder: GameState = {
-        towers: [
-            { id: 0, disks: disksPlaceholder },
-            { id: 1, disks: [] },
-            { id: 2, disks: [] },
-        ],
-        movesCount: 0,
-        isGameWon: false,
-        difficulty,
-        timePassed: 0
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [gameState, setGameState] = useState<GameState>(gameStatePlaceholder);
+    useEffect(() => {
+        console.log(gameState.towers)
+    }, [gameState.towers]);
 
     return (
         <Layout>
-            <GameControls gameState={gameState} />
-            
-            <HanoiGame gameState={gameState}/>
+            <GameControls 
+                movesCount={gameState.movesCount}
+                timePassed={timePassed}
+                isTimerRunning={isTimerRunning}
+                onReset={resetGame}
+                onPause={pauseGame}
+                onResume={resumeGame}
+                onQuite={onQuit} 
+            />
+
+            <HanoiGame gameState={gameState} onTowerSelect={handleTowerSelect} />
         </Layout>
     )
 }
