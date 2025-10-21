@@ -6,9 +6,16 @@ import { Button } from "../components/common/Button";
 import { DifficultyOption } from "../components/common/DifficultyOption";
 import { difficulties } from "../constants/game.constants";
 import { Card } from "../components/common/Card";
+import useLocalStorage from "../hooks/useLocalStorage";
 
 export function StartPage({ onGameStart }: { onGameStart: (selectedDifficulty: Difficulty) => void }) {
-    const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(difficulties[1]);
+    const { storedValue, setValue } = useLocalStorage("gameSettings", { difficulty: difficulties[1] });
+    const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>(storedValue.difficulty);
+
+    const handleClick = () => {
+        setValue({ difficulty: selectedDifficulty })
+        onGameStart(selectedDifficulty)
+    }
 
     return (
         <>
@@ -21,7 +28,7 @@ export function StartPage({ onGameStart }: { onGameStart: (selectedDifficulty: D
                         ))}
                     </div>
                     <Button
-                        onClick={() => onGameStart(selectedDifficulty)}
+                        onClick={handleClick}
                         variant="primary"
                         size="large"
                         fullWidth
