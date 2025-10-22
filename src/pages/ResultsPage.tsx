@@ -3,7 +3,7 @@ import { Card } from "../components/common/Card";
 import { StatCard } from "../components/common/StatCard";
 import { InfoRow } from "../components/common/InfoRow";
 import { AchievementMessage } from "../components/common/AchievementMessage";
-import { Layout } from "../components/layout/Layout";
+// import { Layout } from "../components/layout/Layout";
 import { formatTime } from "../utils/format.utils";
 import type { ResultsPageProps } from "../types/ui.types";
 
@@ -12,9 +12,11 @@ export function ResultsPage({ gameStatistic, onPlayAgain, onMainMenu }: ResultsP
     const hasTimeLimit = difficulty.isTimerOn && difficulty.timeLimit !== null;
 
     return (
-        <Layout>
+        <>
             <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8">
-                <Card title={isGameWon ? "🥳 Congratulations!" : "🙏 Don't give up, you can do it!"}>
+                <Card>
+                    <h1 className="font-serif text-3xl">{isGameWon ? "🥳 Congratulations!" : "🙏 Don't give up, you can do it!"}</h1>
+                    <hr className="border-1 border-gray-500" />
                     <h2 className="text-center font-bold text-xl">
                         {isGameWon ? "Victory!" : "Game Over"}
                     </h2>
@@ -89,6 +91,6 @@ export function ResultsPage({ gameStatistic, onPlayAgain, onMainMenu }: ResultsP
                     </div>
                 </Card>
             </div>
-        </Layout>
+        </>
     )
 }

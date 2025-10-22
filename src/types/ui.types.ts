@@ -33,7 +33,6 @@ export type ResultsPageProps = {
 export type GamePageProps = {
     difficulty: Difficulty,
     onQuit: () => void,
-    onGameComplete: (movesCount: number, timePassed: number, remainingTime: number | null, isGameWon: boolean) => void
 }
 
 export type GameControlsProps = {
