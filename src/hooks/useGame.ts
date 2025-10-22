@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import type { Difficulty, Disk, GameState } from "../types/game.types";
 import { useDiskMovement } from "./useDiskMovement";
 import { useGameValidation } from "./useGameValidation";
@@ -6,21 +6,7 @@ import { useTimer } from "./useTimer";
 import { useTowerSelection } from "./useTowerSelection";
 
 export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: number, timePassed: number, remainingTime: number | null, isGameWon: boolean) => void) {
-    const handleTimeUp = () => {
-        setGameState(prev => ({
-            ...prev,
-            isGameLost: true,
-        }));
-        onGameComplete?.(gameState.movesCount, difficulty.timeLimit!, 0, false);
-    };
-
-    const validation = useGameValidation();
-    const timer = useTimer(true, difficulty.timeLimit, handleTimeUp); 
-    const selection = useTowerSelection();
-    const movement = useDiskMovement();
-
     const diskCount = difficulty.disks;
-
     const initializeGame = (): GameState => {
 
         const disks: Disk[] = Array.from({ length: diskCount }, (_, i) => ({
@@ -43,6 +29,19 @@ export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: num
     }
 
     const [gameState, setGameState] = useState<GameState>(initializeGame());
+    
+    const handleTimeUp = useCallback(() => {
+        setGameState(prev => ({
+            ...prev,
+            isGameLost: true,
+        }));
+        onGameComplete?.(gameState.movesCount, difficulty.timeLimit!, 0, false);
+    }, [onGameComplete, difficulty.timeLimit, gameState.movesCount]);
+
+    const validation = useGameValidation();
+    const timer = useTimer(true, difficulty.timeLimit, handleTimeUp); 
+    const selection = useTowerSelection();
+    const movement = useDiskMovement();
 
     const handleTowerSelect = (towerId: number) => {
         if (gameState.isGameWon || gameState.isGameLost || !timer.isRunning) return;

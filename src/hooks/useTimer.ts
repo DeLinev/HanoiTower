@@ -5,6 +5,9 @@ export function useTimer(autoStart: boolean = false, timeLimit: number | null = 
     const [isRunning, setIsRunning] = useState(autoStart);
     const [isTimeUp, setIsTimeUp] = useState(false);
     const intervalIdRef = useRef<number | undefined>(undefined);
+    const onTimeUpRef = useRef(onTimeUp);
+
+    onTimeUpRef.current = onTimeUp;
 
     const start = () => { setIsRunning(true) };
     const pause = () => { setIsRunning(false) };
@@ -27,7 +30,7 @@ export function useTimer(autoStart: boolean = false, timeLimit: number | null = 
                     if (timeLimit && newTime >= timeLimit) {
                         setIsRunning(false);
                         setIsTimeUp(true);
-                        onTimeUp?.();
+                        onTimeUpRef.current?.();
                     }
                     return newTime;
                 });
@@ -44,7 +47,7 @@ export function useTimer(autoStart: boolean = false, timeLimit: number | null = 
                 clearInterval(intervalIdRef.current);
             }
         };
-    }, [isRunning, timeLimit, onTimeUp]);
+    }, [isRunning, timeLimit]);
 
     const timeRemaining = timeLimit ? Math.max(0, timeLimit - timePassed) : null;
 
