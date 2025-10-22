@@ -3,7 +3,7 @@ import { formatTime } from "../../utils/format.utils";
 import { Button } from "../common/Button";
 import { Card } from "../common/Card";
 
-export function GameControls({ movesCount, timePassed, isTimerRunning, onReset, onPause, onResume, onQuite }: GameControlsProps) {
+export function GameControls({ movesCount, timePassed, timeRemaining, isTimerRunning, onReset, onPause, onResume, onQuite }: GameControlsProps) {
     return (
         <Card>
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -13,8 +13,12 @@ export function GameControls({ movesCount, timePassed, isTimerRunning, onReset, 
                         <div className="text-2xl font-bold">{movesCount}</div>
                     </div>
                     <div className="text-center">
-                        <div className="text-sm text-gray-200 mb-1">Time</div>
-                        <div className="text-2xl font-bold">{formatTime(timePassed)}</div>
+                        <div className="text-sm text-gray-200 mb-1">
+                            {timeRemaining !== null && timeRemaining !== undefined ? 'Time Left' : 'Time'}
+                        </div>
+                        <div className="text-2xl font-bold">
+                            {formatTime(timeRemaining !== null && timeRemaining !== undefined ? timeRemaining : timePassed)}
+                        </div>
                     </div>
                 </div>
 

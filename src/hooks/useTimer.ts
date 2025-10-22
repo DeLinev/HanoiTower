@@ -1,30 +1,41 @@
 import { useEffect, useRef, useState } from "react"
 
-export function useTimer(autoStart: boolean = false) {
+export function useTimer(autoStart: boolean = false, timeLimit: number | null = null, onTimeUp?: () => void) {
     const [timePassed, setTimePassed] = useState(0);
     const [isRunning, setIsRunning] = useState(autoStart);
-    const intervalIdRef = useRef<number | null>(null);
+    const [isTimeUp, setIsTimeUp] = useState(false);
+    const intervalIdRef = useRef<number | undefined>(undefined);
 
     const start = () => { setIsRunning(true) };
     const pause = () => { setIsRunning(false) };
     const reset = () => {
         setTimePassed(0);
         setIsRunning(false);
+        setIsTimeUp(false);
     }
     const restart = () => {
         setTimePassed(0);
         setIsRunning(true);
+        setIsTimeUp(false);
     }
 
     useEffect(() => {
         if (isRunning) {
             intervalIdRef.current = setInterval(() => {
-                setTimePassed((prevTime) => prevTime + 1);
+                setTimePassed((prevTime) => {
+                    const newTime = prevTime + 1;
+                    if (timeLimit && newTime >= timeLimit) {
+                        setIsRunning(false);
+                        setIsTimeUp(true);
+                        onTimeUp?.();
+                    }
+                    return newTime;
+                });
             }, 1000);
         } else {
             if (intervalIdRef.current) {
                 clearInterval(intervalIdRef.current);
-                intervalIdRef.current = null;
+                intervalIdRef.current = undefined;
             }
         }
 
@@ -33,11 +44,15 @@ export function useTimer(autoStart: boolean = false) {
                 clearInterval(intervalIdRef.current);
             }
         };
-    }, [isRunning]);
+    }, [isRunning, timeLimit, onTimeUp]);
+
+    const timeRemaining = timeLimit ? Math.max(0, timeLimit - timePassed) : null;
 
     return {
-        timePassed, 
+        timePassed,
+        timeRemaining,
         isRunning,
+        isTimeUp,
         start,
         pause,
         reset,

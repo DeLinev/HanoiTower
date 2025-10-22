@@ -5,26 +5,29 @@ import type { GamePageProps } from "../types/ui.types";
 import { useGame } from "../hooks/useGame";
 import { useEffect } from "react";
 
-export function GamePage({ difficulty, onQuit, onGameWin }: GamePageProps) {
+export function GamePage({ difficulty, onQuit, onGameComplete }: GamePageProps) {
+
     const {
         gameState,
         timePassed,
+        timeRemaining,
         handleTowerSelect,
         isTimerRunning,
         resetGame,
         pauseGame,
         resumeGame,
-    } = useGame(difficulty, onGameWin);
+    } = useGame(difficulty, onGameComplete);
 
     useEffect(() => {
         console.log(gameState.towers)
     }, [gameState.towers]);
 
     return (
-        <Layout>
+        <Layout>         
             <GameControls 
                 movesCount={gameState.movesCount}
                 timePassed={timePassed}
+                timeRemaining={timeRemaining}
                 isTimerRunning={isTimerRunning}
                 onReset={resetGame}
                 onPause={pauseGame}

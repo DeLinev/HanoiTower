@@ -1,18 +1,25 @@
 import { useState } from "react";
-import { difficulties } from "../constants/game.constants";
 import type { Difficulty, Disk, GameState } from "../types/game.types";
 import { useDiskMovement } from "./useDiskMovement";
 import { useGameValidation } from "./useGameValidation";
 import { useTimer } from "./useTimer";
 import { useTowerSelection } from "./useTowerSelection";
 
-export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, timePassed: number) => void) {
+export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: number, timePassed: number, remainingTime: number | null, isGameWon: boolean) => void) {
+    const handleTimeUp = () => {
+        setGameState(prev => ({
+            ...prev,
+            isGameLost: true,
+        }));
+        onGameComplete?.(gameState.movesCount, difficulty.timeLimit!, 0, false);
+    };
+
     const validation = useGameValidation();
-    const timer = useTimer(true); // Auto-start the timer
+    const timer = useTimer(true, difficulty.timeLimit, handleTimeUp); 
     const selection = useTowerSelection();
     const movement = useDiskMovement();
 
-    const diskCount = difficulties.find(diff => diff.label === difficulty.label)!.disks;
+    const diskCount = difficulty.disks;
 
     const initializeGame = (): GameState => {
 
@@ -29,6 +36,7 @@ export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, 
             ],
             movesCount: 0,
             isGameWon: false,
+            isGameLost: false,
             selectedTower: null,
             difficulty,
         };
@@ -37,7 +45,7 @@ export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, 
     const [gameState, setGameState] = useState<GameState>(initializeGame());
 
     const handleTowerSelect = (towerId: number) => {
-        if (gameState.isGameWon || !timer.isRunning) return;
+        if (gameState.isGameWon || gameState.isGameLost || !timer.isRunning) return;
 
         const selectedTower = gameState.towers.find(t => t.id === towerId);
 
@@ -71,13 +79,14 @@ export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, 
 
                 if (isWon) {
                     timer.pause();
-                    onGameWin?.(newMovesCount, timer.timePassed);
+                    onGameComplete?.(newMovesCount, timer.timePassed, timer.timeRemaining, true);
                 }
 
                 setGameState({
                     towers: newTowers,
                     movesCount: newMovesCount,
                     isGameWon: isWon,
+                    isGameLost: false,
                     selectedTower: null,
                     difficulty,
                 });
@@ -105,7 +114,7 @@ export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, 
     }
 
     const resumeGame = () => {
-        if (!gameState.isGameWon) {
+        if (!gameState.isGameWon && !gameState.isGameLost) {
             timer.start();
         }
     };
@@ -115,7 +124,9 @@ export function useGame(difficulty: Difficulty, onGameWin: (movesCount: number, 
     return {
         gameState,
         timePassed: timer.timePassed,
+        timeRemaining: timer.timeRemaining,
         isTimerRunning: timer.isRunning,
+        isTimeUp: timer.isTimeUp,
         minMoves: minMoves,
         handleTowerSelect,
         resetGame,

@@ -17,16 +17,18 @@ function App() {
     setCurrentPage('game')
   }
 
-  const handleGameComplete = (movesCount: number, timePassed: number) => {
+  const handleGameComplete = (movesCount: number, timePassed: number, timeRemaining: number | null, isGameWon: boolean) => {
     const minMoves = Math.pow(2, difficulty.disks) - 1;
     const efficiency = Math.round((minMoves / movesCount) * 100);
 
     setGameStats({
       movesCount,
       timePassed,
+      timeRemaining,
       difficulty,
       minMoves,
-      efficiency
+      efficiency,
+      isGameWon
     });
     setCurrentPage('results');
   }
@@ -38,7 +40,7 @@ function App() {
       )}
 
       {currentPage === 'game' && (
-        <GamePage difficulty={difficulty} onGameWin={handleGameComplete} onQuit={() => setCurrentPage('start')} />
+        <GamePage difficulty={difficulty} onGameComplete={handleGameComplete} onQuit={() => setCurrentPage('start')} />
       )}
 
       {currentPage === 'results' && (
