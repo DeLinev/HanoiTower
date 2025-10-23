@@ -1,24 +1,26 @@
 import { Layout } from "../components/layout/Layout";
 import { GameControls } from "../components/game/GameControls";
 import { HanoiGame } from "../components/game/HanoiGame";
-import type { GamePageProps } from "../types/ui.types";
 import { useGame } from "../hooks/useGame";
 import { useState } from "react";
 import Portal from "../components/common/Portal";
-import type { GameStatistic } from "../types/game.types";
+import type { Difficulty, GameStatistic } from "../types/game.types";
 import { ResultsPage } from "./ResultsPage";
+import useLocalStorage from "../hooks/useLocalStorage";
+import { difficulties } from "../constants/game.constants";
 
-export function GamePage({ difficulty, onQuit }: GamePageProps) {
+export function GamePage() {
+     const { storedValue } = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
 
     const handleGameComplete = (movesCount: number, timePassed: number, timeRemaining: number | null, isGameWon: boolean) => {
-        const minMoves = Math.pow(2, difficulty.disks) - 1;
+        const minMoves = Math.pow(2, storedValue.disks) - 1;
         const efficiency = Math.round((minMoves / movesCount) * 100);
 
         setGameStats({
             movesCount,
             timePassed,
             timeRemaining,
-            difficulty,
+            difficulty: storedValue,
             minMoves,
             efficiency,
             isGameWon
@@ -40,7 +42,7 @@ export function GamePage({ difficulty, onQuit }: GamePageProps) {
         resetGame,
         pauseGame,
         resumeGame,
-    } = useGame(difficulty, handleGameComplete);
+    } = useGame(storedValue, handleGameComplete);
 
     const [showModal, setShowModal] = useState(false);
     const [gameStats, setGameStats] = useState<GameStatistic | null>(null);
@@ -55,7 +57,6 @@ export function GamePage({ difficulty, onQuit }: GamePageProps) {
                 onReset={resetGame}
                 onPause={pauseGame}
                 onResume={resumeGame}
-                onQuite={onQuit}
             />
 
             <HanoiGame gameState={gameState} onTowerSelect={handleTowerSelect} />
@@ -65,7 +66,6 @@ export function GamePage({ difficulty, onQuit }: GamePageProps) {
                     <ResultsPage
                         gameStatistic={gameStats!}
                         onPlayAgain={handlePlayAgain}
-                        onMainMenu={onQuit}
                     />
                 </Portal>
             }

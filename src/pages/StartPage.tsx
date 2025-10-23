@@ -5,34 +5,37 @@ import { Button } from "../components/common/Button";
 import { Card } from "../components/common/Card";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { difficulties } from "../constants/game.constants";
 
 
-export function StartPage({ onGameStart }: { onGameStart: (selectedDifficulty: Difficulty) => void }) {
-    const { storedValue, setValue } = useLocalStorage<SettingsFormData>("gameSettings", { 
-        difficultyValue: "custom", 
-        customDisks: 3,  
-        timeLimit: 120, 
-        isTimerOn: true 
-    });
+export function StartPage() {
+    const navigate = useNavigate();
+    const { storedValue, setValue } = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
 
     const { register, handleSubmit, watch, formState: { errors } } = useForm<SettingsFormData>({
-        defaultValues: { ...storedValue }
+        defaultValues: { 
+            difficultyValue: storedValue.value,
+            isTimerOn: storedValue.isTimerOn,
+            customDisks: storedValue.disks,
+            timeLimit: storedValue.timeLimit
+        }
     });
 
     const isTimerOn = watch("isTimerOn");
 
     const onFormSubmit = (data: SettingsFormData) => {
-        setValue({ ...data });
         const selectedDifficulty: Difficulty = {
             value: "custom",
             label: "Custom",
             disks: data.customDisks,
             description: "Custom difficulty",
             isTimerOn: data.isTimerOn,
-            timeLimit: data.isTimerOn ? data.timeLimit : null
+            timeLimit: data.isTimerOn ? data.timeLimit : undefined
         }
-
-        onGameStart(selectedDifficulty);
+        
+        setValue(selectedDifficulty);
+        navigate('/game');
     }
 
     return (

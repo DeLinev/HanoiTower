@@ -6,7 +6,7 @@ export type Difficulty = {
     disks: number,
     description: string,
     isTimerOn: boolean,
-    timeLimit: number | null
+    timeLimit: number | undefined
 }
 
 export type Disk = {
