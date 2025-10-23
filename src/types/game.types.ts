@@ -1,10 +1,12 @@
-export type DifficultyLevel = 'novice' | 'proficient' | 'expert';
+export type DifficultyLevel = 'novice' | 'proficient' | 'expert' | 'custom';
 
 export type Difficulty = {
     value: DifficultyLevel,
     label: string,
     disks: number,
-    description: string
+    description: string,
+    isTimerOn: boolean,
+    timeLimit: number | null
 }
 
 export type Disk = {
@@ -21,6 +23,7 @@ export type GameState = {
     towers: Tower[],
     movesCount: number,
     isGameWon: boolean,
+    isGameLost: boolean,
     difficulty: Difficulty,
     selectedTower: number | null,
 }
@@ -28,7 +31,16 @@ export type GameState = {
 export type GameStatistic = {
     movesCount: number,
     timePassed: number,
+    timeRemaining: number | null,
     difficulty: Difficulty,
     minMoves: number,
-    efficiency: number
-} 
+    efficiency: number,
+    isGameWon: boolean
+}
+
+export type SettingsFormData = {
+    difficultyValue: string;
+    isTimerOn: boolean;
+    customDisks: number;
+    timeLimit: number;
+}
