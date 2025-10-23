@@ -15,7 +15,7 @@ export function ResultsPage({ gameStatistic, onPlayAgain, onMainMenu }: ResultsP
         <>
             <div className="flex flex-col items-center justify-center min-h-[70vh] gap-8">
                 <Card>
-                    <h1 className="font-serif text-3xl">{isGameWon ? "🥳 Congratulations!" : "🙏 Don't give up, you can do it!"}</h1>
+                    <h1 className="font-serif text-3xl text-center">{isGameWon ? "🥳 Congratulations!" : "🙏 Don't give up, you can do it!"}</h1>
                     <hr className="border-1 border-gray-500" />
                     <h2 className="text-center font-bold text-xl">
                         {isGameWon ? "Victory!" : "Game Over"}
