@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { useState } from "react";
 import Logo from "../../assets/logo.svg"
 import { QuestionMarkCircleIcon } from "@heroicons/react/24/outline";
+import { Link } from "react-router-dom";
 
 export function Layout({ children }: { children: ReactNode }) {
     const [showTooltip, setShowTooltip] = useState(false);
@@ -12,7 +13,7 @@ export function Layout({ children }: { children: ReactNode }) {
             <header className="relative flex items-center justify-center p-3 border-b border-gray-700">
                 <div className="flex flex-row items-center gap-2">
                     <img src={Logo} alt="Hanoi Tower Logo" className="w-8 h-8" />
-                    <h1 className="text-2xl font-bold text-gray-300">Tower of Hanoi</h1>
+                    <Link to={"/"}><h1 className="text-2xl font-bold text-gray-300">Tower of Hanoi</h1></Link>
                 </div>
                 <div className="absolute right-3">
                     <QuestionMarkCircleIcon 
