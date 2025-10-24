@@ -4,19 +4,21 @@ import { HanoiGame } from "../components/game/HanoiGame";
 import { useGame } from "../hooks/useGame";
 import { useState } from "react";
 import Portal from "../components/common/Portal";
-import type { Difficulty, GameStatistic } from "../types/game.types";
+import type { Difficulty, GameStatistic, Scoreboard } from "../types/game.types";
 import { ResultsPage } from "./ResultsPage";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { difficulties } from "../constants/game.constants";
 
 export function GamePage() {
-     const { storedValue } = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
+    const [storedValue] = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
+    const [currentPlayer] = useLocalStorage<string>("currentPlayer", "Player1");
+    const [, setScoreboard] = useLocalStorage<Scoreboard>("scoreboard", []);
 
     const handleGameComplete = (movesCount: number, timePassed: number, timeRemaining: number | null, isGameWon: boolean) => {
         const minMoves = Math.pow(2, storedValue.disks) - 1;
         const efficiency = Math.round((minMoves / movesCount) * 100);
 
-        setGameStats({
+        const newGameStats: GameStatistic = {
             movesCount,
             timePassed,
             timeRemaining,
@@ -24,7 +26,27 @@ export function GamePage() {
             minMoves,
             efficiency,
             isGameWon
+        };
+
+        setGameStats(newGameStats);
+        setScoreboard((prevScoreboard) => {
+            const playerIndex = prevScoreboard.findIndex(player => player.nickname === currentPlayer);
+            
+            if (playerIndex !== -1) {
+                const updatedScoreboard = [...prevScoreboard];
+                updatedScoreboard[playerIndex] = {
+                    ...updatedScoreboard[playerIndex],
+                    gameStats: [...updatedScoreboard[playerIndex].gameStats, newGameStats]
+                };
+                return updatedScoreboard;
+            } else {
+                return [...prevScoreboard, {
+                    nickname: currentPlayer,
+                    gameStats: [newGameStats]
+                }];
+            }
         });
+
         setShowModal(true);
     }
 

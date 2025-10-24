@@ -10,7 +10,7 @@ export function StatCard({ value, label, color }: StatCardProps) {
     };
 
     return (
-        <div className={`${colorClasses[color]} rounded-lg p-2 text-center`}>
+        <div className={`${colorClasses[color]} rounded-lg p-2 flex flex-col justify-center items-center`}>
             <div className="text-4xl font-bold mb-2">
                 {value}
             </div>

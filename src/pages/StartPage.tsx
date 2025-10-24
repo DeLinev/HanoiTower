@@ -11,14 +11,16 @@ import { difficulties } from "../constants/game.constants";
 
 export function StartPage() {
     const navigate = useNavigate();
-    const { storedValue, setValue } = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
+    const [ gameSettingValue, setGameSettingValue ] = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
+    const [ currentPlayer, setCurrentPlayer ] = useLocalStorage<string>("currentPlayer", "Player1");
 
     const { register, handleSubmit, watch, formState: { errors } } = useForm<SettingsFormData>({
         defaultValues: { 
-            difficultyValue: storedValue.value,
-            isTimerOn: storedValue.isTimerOn,
-            customDisks: storedValue.disks,
-            timeLimit: storedValue.timeLimit
+            nickname: currentPlayer,
+            difficultyValue: gameSettingValue.value,
+            isTimerOn: gameSettingValue.isTimerOn,
+            customDisks: gameSettingValue.disks,
+            timeLimit: gameSettingValue.timeLimit
         }
     });
 
@@ -34,7 +36,8 @@ export function StartPage() {
             timeLimit: data.isTimerOn ? data.timeLimit : undefined
         }
         
-        setValue(selectedDifficulty);
+        setGameSettingValue(selectedDifficulty);
+        setCurrentPlayer(data.nickname);
         navigate('/game');
     }
 
@@ -43,6 +46,21 @@ export function StartPage() {
             <Layout>
                 <Card Icon={Cog6ToothIcon} title="Game Settings">
                     <form className="flex flex-col gap-4" onSubmit={handleSubmit(onFormSubmit)}>
+                        <div className="flex flex-col gap-2">
+                            <label htmlFor="nickname">Nickname:</label>
+                            <input
+                                id="nickname"
+                                className="border-1 border-white p-1"
+                                {...register("nickname", {
+                                    required: 'Nickname is required',
+                                    minLength: { value: 3, message: "Length of the nickname must be at least 3." },
+                                    maxLength: { value: 10, message: "Length of the nickname should not exceed 10." }
+                                })}
+                            />
+                            {errors.nickname && (
+                                <p className="text-red-400">{errors.nickname.message}</p>
+                            )}
+                        </div>
                         <h2 className="text-center font-bold text-xl">Choose difficulty</h2>
                         <div className="flex flex-col gap-2">
                             <label htmlFor="customDisks">Number of disks:</label>
@@ -51,7 +69,7 @@ export function StartPage() {
                                 type="number"
                                 className="border-1 border-white p-1"
                                 {...register("customDisks", {
-                                    required: 'Age is required',
+                                    required: 'Number of disks is required',
                                     min: { value: 3, message: "Number of disks must be at least 3." },
                                     max: { value: 10, message: "Number of disks should not exceed 10." },
                                     valueAsNumber: true
@@ -104,6 +122,12 @@ export function StartPage() {
                         </Button>
                     </form>
                 </Card>
+                <Button
+                    onClick={() => navigate("/scoreboard")}
+                    variant="secondary"
+                >
+                    Scoreboard
+                </Button>
             </Layout>
         </>
     )

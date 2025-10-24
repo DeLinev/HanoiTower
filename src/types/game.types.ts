@@ -39,8 +39,16 @@ export type GameStatistic = {
 }
 
 export type SettingsFormData = {
+    nickname: string
     difficultyValue: string;
     isTimerOn: boolean;
     customDisks: number;
     timeLimit: number;
 }
+
+export type PlayerScore = {
+    nickname: string;
+    gameStats: GameStatistic[];
+}
+
+export type Scoreboard = PlayerScore[];
