@@ -118,15 +118,12 @@ export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: num
         }
     };
 
-    const minMoves = validation.getMinMoves(diskCount);
-
     return {
         gameState,
         timePassed: timer.timePassed,
         timeRemaining: timer.timeRemaining,
         isTimerRunning: timer.isRunning,
         isTimeUp: timer.isTimeUp,
-        minMoves: minMoves,
         handleTowerSelect,
         resetGame,
         pauseGame,

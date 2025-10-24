@@ -15,7 +15,6 @@ export default function ScorePage() {
     }
 
     const { gameStats } = userScore;
-
     const totalGames = gameStats.length;
     const gamesWon = gameStats.filter(game => game.isGameWon).length;
     const gamesLost = totalGames - gamesWon;

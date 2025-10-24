@@ -40,10 +40,11 @@ export type GameStatistic = {
 
 export type SettingsFormData = {
     nickname: string
-    difficultyValue: string;
-    isTimerOn: boolean;
-    customDisks: number;
-    timeLimit: number;
+    difficultyValue: string,
+    isTimerOn: boolean,
+    customDisks: number,
+    timeLimitMin: number,
+    timeLimitSec: number,
 }
 
 export type PlayerScore = {
