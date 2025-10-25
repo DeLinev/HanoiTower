@@ -1,30 +1,21 @@
-import { useState } from "react";
-import { StartPage } from "./pages/StartPage"
 import { GamePage } from "./pages/GamePage";
-import type { Difficulty } from "./types/game.types";
-import { difficulties } from "./constants/game.constants";
-
-type PageType = 'start' | 'game' | 'results';
+import NotFoundPage from "./pages/NotFoundPage";
+import ScoreboardPage from "./pages/ScoreboardPage";
+import ScorePage from "./pages/ScorePage";
+import { StartPage } from "./pages/StartPage"
+import { Route, Routes } from "react-router-dom";
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<PageType>('start');
-  const [difficulty, setDifficulty] = useState<Difficulty>(difficulties[1]);
-
-  const handleGameStart = (selectedDifficulty: Difficulty) => {
-    setDifficulty(selectedDifficulty);
-    setCurrentPage('game')
-  }
 
   return (
-    <>
-      {currentPage === 'start' && (
-        <StartPage onGameStart={handleGameStart} />
-      )}
-
-      {currentPage === 'game' && (
-        <GamePage difficulty={difficulty} onQuit={() => setCurrentPage('start')} />
-      )}
-    </>
+    <Routes>
+      <Route path="/" element={<StartPage />} />
+      <Route path="/game" element={<GamePage />} />
+      <Route path="/scoreboard" element={<ScoreboardPage />} />
+      <Route path="/score/:nickname" element={<ScorePage />} />
+      <Route path="/not-found" element={<NotFoundPage />} />
+      <Route path="*" element={<NotFoundPage />} />
+    </Routes>
   )
 }
 

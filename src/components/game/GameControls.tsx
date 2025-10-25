@@ -1,9 +1,12 @@
+import { useNavigate } from "react-router-dom";
 import type { GameControlsProps } from "../../types/ui.types";
 import { formatTime } from "../../utils/format.utils";
 import { Button } from "../common/Button";
 import { Card } from "../common/Card";
 
-export function GameControls({ movesCount, timePassed, timeRemaining, isTimerRunning, onReset, onPause, onResume, onQuite }: GameControlsProps) {
+export function GameControls({ movesCount, timePassed, timeRemaining, isTimerRunning, onReset, onPause, onResume }: GameControlsProps) {
+    const navigate = useNavigate();
+    
     return (
         <Card>
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -36,7 +39,7 @@ export function GameControls({ movesCount, timePassed, timeRemaining, isTimerRun
                             Resume
                         </Button>
                     }
-                    <Button variant="secondary" size="small" onClick={onQuite}>
+                    <Button variant="secondary" size="small" onClick={() => navigate("/")}>
                         Quite
                     </Button>
                 </div>

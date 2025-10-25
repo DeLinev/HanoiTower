@@ -27,12 +27,6 @@ export type StatCardProps = {
 export type ResultsPageProps = {
     gameStatistic: GameStatistic,
     onPlayAgain: () => void,
-    onMainMenu: () => void
-}
-
-export type GamePageProps = {
-    difficulty: Difficulty,
-    onQuit: () => void,
 }
 
 export type GameControlsProps = {
@@ -42,8 +36,7 @@ export type GameControlsProps = {
     isTimerRunning: boolean,
     onReset: () => void, 
     onPause: () => void, 
-    onResume: () => void, 
-    onQuite: () => void
+    onResume: () => void
 }
 
 export type HanoiGameProps = { 

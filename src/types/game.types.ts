@@ -6,7 +6,7 @@ export type Difficulty = {
     disks: number,
     description: string,
     isTimerOn: boolean,
-    timeLimit: number | null
+    timeLimit: number | undefined
 }
 
 export type Disk = {
@@ -39,8 +39,17 @@ export type GameStatistic = {
 }
 
 export type SettingsFormData = {
-    difficultyValue: string;
-    isTimerOn: boolean;
-    customDisks: number;
-    timeLimit: number;
+    nickname: string
+    difficultyValue: string,
+    isTimerOn: boolean,
+    customDisks: number,
+    timeLimitMin: number,
+    timeLimitSec: number,
 }
+
+export type PlayerScore = {
+    nickname: string;
+    gameStats: GameStatistic[];
+}
+
+export type Scoreboard = PlayerScore[];

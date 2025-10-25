@@ -11,10 +11,11 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
         }
     });
 
-    const setValue = (value: T) => {
+    const setValue = (value: T | ((prevValue: T) => T)) => {
         try {
-            setStoredValue(value);
-            localStorage.setItem(key, JSON.stringify(value));
+            const valueToStore = value instanceof Function ? value(storedValue) : value;
+            setStoredValue(valueToStore);
+            localStorage.setItem(key, JSON.stringify(valueToStore));
         } catch (error) {
             console.log(`[ERROR] Can't set localStorage key "${key}":`, error);
         }
@@ -44,9 +45,9 @@ export default function useLocalStorage<T>(key: string, initialValue: T) {
         return () => window.removeEventListener('storage', handleStorageChange);
     }, [key]);
 
-    return {
+    return [
         storedValue,
         setValue,
         removeValue
-    }
+    ] as const;
 }

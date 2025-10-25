@@ -3,11 +3,12 @@ import { Card } from "../components/common/Card";
 import { StatCard } from "../components/common/StatCard";
 import { InfoRow } from "../components/common/InfoRow";
 import { AchievementMessage } from "../components/common/AchievementMessage";
-// import { Layout } from "../components/layout/Layout";
 import { formatTime } from "../utils/format.utils";
 import type { ResultsPageProps } from "../types/ui.types";
+import { useNavigate } from "react-router-dom";
 
-export function ResultsPage({ gameStatistic, onPlayAgain, onMainMenu }: ResultsPageProps) {
+export function ResultsPage({ gameStatistic, onPlayAgain }: ResultsPageProps) {
+    const navigate = useNavigate();
     const { isGameWon, difficulty, timeRemaining } = gameStatistic;
     const hasTimeLimit = difficulty.isTimerOn && difficulty.timeLimit !== null;
 
@@ -84,7 +85,7 @@ export function ResultsPage({ gameStatistic, onPlayAgain, onMainMenu }: ResultsP
                             variant="secondary"
                             size="large"
                             fullWidth
-                            onClick={onMainMenu}
+                            onClick={() => navigate("/")}
                         >
                             Main menu
                         </Button>
