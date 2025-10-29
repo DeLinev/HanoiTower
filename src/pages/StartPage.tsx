@@ -6,22 +6,21 @@ import { Card } from "../components/common/Card";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { difficulties } from "../constants/game.constants";
-
+import { useGameSettingsStore } from "../stores/useGameSettingsStore";
 
 export function StartPage() {
     const navigate = useNavigate();
-    const [gameSettingValue, setGameSettingValue] = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
+    const { difficulty, setDifficulty } = useGameSettingsStore();
     const [currentPlayer, setCurrentPlayer] = useLocalStorage<string>("currentPlayer", "Player1");
 
     const { register, handleSubmit, watch, formState: { errors } } = useForm<SettingsFormData>({
         defaultValues: {
             nickname: currentPlayer,
-            difficultyValue: gameSettingValue.value,
-            isTimerOn: gameSettingValue.isTimerOn,
-            customDisks: gameSettingValue.disks,
-            timeLimitMin: Math.floor((gameSettingValue.timeLimit ?? 0) / 60),
-            timeLimitSec: (gameSettingValue.timeLimit ?? 0) % 60
+            difficultyValue: difficulty.value,
+            isTimerOn: difficulty.isTimerOn,
+            customDisks: difficulty.disks,
+            timeLimitMin: Math.floor((difficulty.timeLimit ?? 0) / 60),
+            timeLimitSec: (difficulty.timeLimit ?? 0) % 60
         }
     });
 
@@ -37,7 +36,7 @@ export function StartPage() {
             timeLimit: data.isTimerOn ? data.timeLimitMin * 60 + data.timeLimitSec : undefined
         }
 
-        setGameSettingValue(selectedDifficulty);
+        setDifficulty(selectedDifficulty);
         setCurrentPlayer(data.nickname);
         navigate('/game');
     }

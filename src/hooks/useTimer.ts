@@ -30,7 +30,6 @@ export function useTimer(autoStart: boolean = false, timeLimit: number | null = 
                     if (timeLimit && newTime >= timeLimit) {
                         setIsRunning(false);
                         setIsTimeUp(true);
-                        onTimeUpRef.current?.();
                     }
                     return newTime;
                 });
@@ -48,6 +47,12 @@ export function useTimer(autoStart: boolean = false, timeLimit: number | null = 
             }
         };
     }, [isRunning, timeLimit]);
+
+    useEffect(() => {
+        if (isTimeUp) {
+            onTimeUpRef.current?.();
+        }
+    }, [isTimeUp]);
 
     const timeRemaining = timeLimit ? Math.max(0, timeLimit - timePassed) : null;
 

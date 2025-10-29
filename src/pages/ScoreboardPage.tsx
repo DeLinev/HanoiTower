@@ -1,10 +1,9 @@
 import { Layout } from "../components/layout/Layout";
-import useLocalStorage from "../hooks/useLocalStorage";
-import type { Scoreboard } from "../types/game.types";
 import { useNavigate } from "react-router-dom";
+import { useScoreboardStore } from "../stores/useScoreboardStore";
 
 export default function ScoreboardPage() {
-    const [scoreboard] = useLocalStorage<Scoreboard>('scoreboard', []);
+    const { scoreboard } = useScoreboardStore();
     const navigate = useNavigate();
 
     const handleNicknameClick = (nickname: string) => {

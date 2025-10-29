@@ -31,10 +31,6 @@ export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: num
     const [gameState, setGameState] = useState<GameState>(initializeGame());
     
     const handleTimeUp = useCallback(() => {
-        setGameState(prev => ({
-            ...prev,
-            isGameLost: true,
-        }));
         onGameComplete?.(gameState.movesCount, difficulty.timeLimit!, 0, false);
     }, [onGameComplete, difficulty.timeLimit, gameState.movesCount]);
 

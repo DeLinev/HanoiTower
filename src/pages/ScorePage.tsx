@@ -1,12 +1,12 @@
 import { Navigate, useParams } from "react-router-dom";
-import useLocalStorage from "../hooks/useLocalStorage"
-import type { GameStatistic, Scoreboard } from "../types/game.types";
+import type { GameStatistic } from "../types/game.types";
 import { Layout } from "../components/layout/Layout";
 import { StatCard } from "../components/common/StatCard";
 import StatRow from "../components/common/StatRow";
+import { useScoreboardStore } from "../stores/useScoreboardStore";
 
 export default function ScorePage() {
-    const [scoreboard] = useLocalStorage<Scoreboard>('scoreboard', []);
+    const { scoreboard } = useScoreboardStore();
     const { nickname } = useParams();
 
     const userScore = scoreboard.find(entry => entry.nickname === nickname);

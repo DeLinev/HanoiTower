@@ -4,49 +4,33 @@ import { HanoiGame } from "../components/game/HanoiGame";
 import { useGame } from "../hooks/useGame";
 import { useState } from "react";
 import Portal from "../components/common/Portal";
-import type { Difficulty, GameStatistic, Scoreboard } from "../types/game.types";
+import type { GameStatistic } from "../types/game.types";
 import { ResultsPage } from "./ResultsPage";
 import useLocalStorage from "../hooks/useLocalStorage";
-import { difficulties } from "../constants/game.constants";
+import { useGameSettingsStore } from "../stores/useGameSettingsStore";
+import { useScoreboardStore } from "../stores/useScoreboardStore";
 
 export function GamePage() {
-    const [storedValue] = useLocalStorage<Difficulty>("gameSettings", difficulties[1]);
+    const { difficulty } = useGameSettingsStore();
+    const { addRecord } = useScoreboardStore();
     const [currentPlayer] = useLocalStorage<string>("currentPlayer", "Player1");
-    const [, setScoreboard] = useLocalStorage<Scoreboard>("scoreboard", []);
 
     const handleGameComplete = (movesCount: number, timePassed: number, timeRemaining: number | null, isGameWon: boolean) => {
-        const minMoves = Math.pow(2, storedValue.disks) - 1;
+        const minMoves = Math.pow(2, difficulty.disks) - 1;
         const efficiency = Math.round((minMoves / movesCount) * 100);
 
         const newGameStats: GameStatistic = {
             movesCount,
             timePassed,
             timeRemaining,
-            difficulty: storedValue,
+            difficulty: difficulty,
             minMoves,
             efficiency,
             isGameWon
         };
 
         setGameStats(newGameStats);
-        setScoreboard((prevScoreboard) => {
-            const playerIndex = prevScoreboard.findIndex(player => player.nickname === currentPlayer);
-            
-            if (playerIndex !== -1) {
-                const updatedScoreboard = [...prevScoreboard];
-                updatedScoreboard[playerIndex] = {
-                    ...updatedScoreboard[playerIndex],
-                    gameStats: [...updatedScoreboard[playerIndex].gameStats, newGameStats]
-                };
-                return updatedScoreboard;
-            } else {
-                return [...prevScoreboard, {
-                    nickname: currentPlayer,
-                    gameStats: [newGameStats]
-                }];
-            }
-        });
-
+        addRecord(newGameStats, currentPlayer);
         setShowModal(true);
     }
 
@@ -64,7 +48,7 @@ export function GamePage() {
         resetGame,
         pauseGame,
         resumeGame,
-    } = useGame(storedValue, handleGameComplete);
+    } = useGame(difficulty, handleGameComplete);
 
     const [showModal, setShowModal] = useState(false);
     const [gameStats, setGameStats] = useState<GameStatistic | null>(null);
