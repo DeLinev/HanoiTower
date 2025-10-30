@@ -1,5 +1,5 @@
 import type { ElementType, ReactNode } from "react"
-import type { Difficulty, GameStatistic } from "./game.types"
+import type { Difficulty, GameStatistic, Tower } from "./game.types"
 
 export type DifficultyProps = {
     diff: Difficulty,
@@ -40,4 +40,10 @@ export type GameControlsProps = {
 
 export type HanoiGameProps = {
     onTowerSelect: (towerId: number) => void;
+}
+
+export type TowerProps = { 
+    tower: Tower, 
+    onClick: () => void, 
+    isSelected: boolean 
 }
