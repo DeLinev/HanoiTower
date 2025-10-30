@@ -1,11 +1,13 @@
 import { useNavigate } from "react-router-dom";
-import type { GameControlsProps } from "../../types/ui.types";
 import { formatTime } from "../../utils/format.utils";
 import { Button } from "../common/Button";
 import { Card } from "../common/Card";
+import { useGameStateStore } from "../../stores/useGameStateStore";
+import type { GameControlsProps } from "../../types/ui.types";
 
-export function GameControls({ movesCount, timePassed, timeRemaining, isTimerRunning, onReset, onPause, onResume }: GameControlsProps) {
+export function GameControls({ timePassed, timeRemaining, isTimerRunning, onReset, onPause, onResume }: GameControlsProps) {
     const navigate = useNavigate();
+    const movesCount = useGameStateStore(state => state.gameState.movesCount);
     
     return (
         <Card>

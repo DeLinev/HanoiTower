@@ -1,7 +1,8 @@
 import type { Tower } from "../../types/game.types";
+import type { TowerProps } from "../../types/ui.types";
 import { Disk } from "./Disk";
 
-export function Tower({ tower, onClick, isSelected } : { tower: Tower, onClick: () => void, isSelected: boolean }) {
+export function Tower({ tower, onClick, isSelected } : TowerProps) {
     return (
         <div
             className="flex flex-col items-center justify-end w-full h-100 relative transition-all duration-200 transform cursor-pointer"

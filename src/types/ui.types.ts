@@ -1,5 +1,5 @@
 import type { ElementType, ReactNode } from "react"
-import type { Difficulty, GameState, GameStatistic } from "./game.types"
+import type { Difficulty, GameStatistic, Tower } from "./game.types"
 
 export type DifficultyProps = {
     diff: Difficulty,
@@ -30,16 +30,20 @@ export type ResultsPageProps = {
 }
 
 export type GameControlsProps = {
-    movesCount: number, 
-    timePassed: number, 
-    timeRemaining?: number | null,
+    timePassed: number,
+    timeRemaining: number | null,
     isTimerRunning: boolean,
-    onReset: () => void, 
-    onPause: () => void, 
-    onResume: () => void
+    onReset: () => void;
+    onPause: () => void;
+    onResume: () => void;
 }
 
-export type HanoiGameProps = { 
-    gameState: GameState, 
-    onTowerSelect: (towerId: number) => void
+export type HanoiGameProps = {
+    onTowerSelect: (towerId: number) => void;
+}
+
+export type TowerProps = { 
+    tower: Tower, 
+    onClick: () => void, 
+    isSelected: boolean 
 }

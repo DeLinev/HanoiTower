@@ -1,10 +1,10 @@
 import { Layout } from "../components/layout/Layout";
-import useLocalStorage from "../hooks/useLocalStorage";
-import type { Scoreboard } from "../types/game.types";
 import { useNavigate } from "react-router-dom";
+import { useScoreboardStore } from "../stores/useScoreboardStore";
+import { Button } from "../components/common/Button";
 
 export default function ScoreboardPage() {
-    const [scoreboard] = useLocalStorage<Scoreboard>('scoreboard', []);
+    const { scoreboard, clearScoreboard } = useScoreboardStore();
     const navigate = useNavigate();
 
     const handleNicknameClick = (nickname: string) => {
@@ -24,7 +24,7 @@ export default function ScoreboardPage() {
                     </div>
                 ) : (
                     <div className="overflow-x-auto shadow-md rounded-lg">
-                        <table className="w-full border-collapse">
+                        <table className="w-full border-collapse mb-3">
                             <thead className="bg-gray-900">
                                 <tr>
                                     <th className="px-6 py-4 text-left font-semibold text-sm uppercase tracking-wider">
@@ -58,6 +58,7 @@ export default function ScoreboardPage() {
                                 ))}
                             </tbody>
                         </table>
+                        <Button variant="primary" onClick={clearScoreboard} fullWidth>Clear Scoreboard</Button>
                     </div>
                 )}
             </div>
