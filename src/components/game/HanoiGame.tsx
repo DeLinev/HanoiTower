@@ -1,7 +1,10 @@
-import type { HanoiGameProps } from "../../types/ui.types";
 import { Tower } from "./Tower";
+import { useGameStateStore } from "../../stores/useGameStateStore";
+import type { HanoiGameProps } from "../../types/ui.types";
 
-export function HanoiGame({ gameState, onTowerSelect }: HanoiGameProps) {
+export function HanoiGame({ onTowerSelect }: HanoiGameProps) {
+    const gameState = useGameStateStore(state => state.gameState);
+    
     return (
         <div className="w-full p-8">
             <div className="grid grid-cols-3 gap-8 max-w-4xl mx-auto">

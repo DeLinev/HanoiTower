@@ -1,4 +1,4 @@
-import type { Difficulty, DifficultyLevel, Disk, GameState } from "../types/game.types";
+import type { Difficulty, DifficultyLevel, GameState, } from "../types/game.types";
 
 export const difficulties: Difficulty[] = [
     { value: 'novice' as DifficultyLevel, label: 'Novice', disks: 3, description: '3 disks - ideal for beginners', isTimerOn: true, timeLimit: 60 },
@@ -6,20 +6,11 @@ export const difficulties: Difficulty[] = [
     { value: 'expert' as DifficultyLevel, label: 'Expert', disks: 5, description: '5 disks - for experienced players', isTimerOn: true, timeLimit: 180 },
 ];
 
-export const disksPlaceholder: Disk[] = Array.from({ length: difficulties[1].disks }, (_, i) => ({
-    id: i,
-    size: (difficulties[1].disks - i),
-}));
-
-export const gameStatePlaceholder: GameState = {
-    towers: [
-        { id: 0, disks: disksPlaceholder },
-        { id: 1, disks: [] },
-        { id: 2, disks: [] },
-    ],
-    movesCount: 15,
+export const gameStateDefaultValue: GameState = {
+    towers: [],
+    movesCount: 0,
     isGameWon: false,
     isGameLost: false,
-    difficulty: difficulties[1],
-    selectedTower: null
+    selectedTower: null,
+    difficulty: difficulties[1]
 }

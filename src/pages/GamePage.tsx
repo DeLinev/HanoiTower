@@ -13,7 +13,7 @@ import { useScoreboardStore } from "../stores/useScoreboardStore";
 export function GamePage() {
     const { difficulty } = useGameSettingsStore();
     const { addRecord } = useScoreboardStore();
-    const [currentPlayer] = useLocalStorage<string>("currentPlayer", "Player1");
+    const [ currentPlayer ] = useLocalStorage<string>("currentPlayer", "Player1");
 
     const handleGameComplete = (movesCount: number, timePassed: number, timeRemaining: number | null, isGameWon: boolean) => {
         const minMoves = Math.pow(2, difficulty.disks) - 1;
@@ -40,11 +40,10 @@ export function GamePage() {
     }
 
     const {
-        gameState,
         timePassed,
         timeRemaining,
-        handleTowerSelect,
         isTimerRunning,
+        handleTowerSelect,
         resetGame,
         pauseGame,
         resumeGame,
@@ -55,8 +54,7 @@ export function GamePage() {
 
     return (
         <Layout>
-            <GameControls
-                movesCount={gameState.movesCount}
+            <GameControls 
                 timePassed={timePassed}
                 timeRemaining={timeRemaining}
                 isTimerRunning={isTimerRunning}
@@ -65,7 +63,7 @@ export function GamePage() {
                 onResume={resumeGame}
             />
 
-            <HanoiGame gameState={gameState} onTowerSelect={handleTowerSelect} />
+            <HanoiGame onTowerSelect={handleTowerSelect} />
 
             {showModal &&
                 <Portal>
