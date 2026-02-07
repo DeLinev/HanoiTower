@@ -1,139 +1,142 @@
 # 🏯 Tower of Hanoi
 ![alt text](./docs/images/game.png)
 
-Tower of Hanoi - це гра, що реалізує класичну головоломку **«Ханойська вежа»**. Гравець переміщує диски між трьома стрижнями, дотримуючись правила: більший диск не може лежати на меншому. Підтримує налаштування рівня складності, таймер, систему підрахунку очок та таблицю результатів.
+Tower of Hanoi is a game that implements the classic **"Tower of Hanoi"** puzzle. The player moves disks between three pegs, following the rule: a larger disk cannot be placed on top of a smaller one. It supports difficulty level customization, a timer, a scoring system, and a scoreboard.
 
 ---
 
-## 📑 Зміст
+## 📑 Table of Contents
 
-- [Можливості](#-можливості)
-- [Структура проєкту](#-структура-проєкту)
-- [Початок роботи](#-початок-роботи)
-- [Доступні команди](#-доступні-команди)
-- [Конфігурація](#-конфігурація)
-- [Ліцензія](#-ліцензія)
-- [Автор](#-автор)
-
----
-
-## ✨ Можливості
-
-- **Налаштування рівня складності** - додавайте стільки кілець до гри скільки вважаєте за потрібне
-- **Таймер** - налаштування рівня складності
-- **Таблиця результатів** - збереження статистики гравців у `localStorage`
-- **Статистика гри** - підрахунок ходів, ефективності та часу
-- **Адаптивний інтерфейс** - гра працює чудово на будь-якому екрані
+- [Features](#-features)
+- [Project Structure](#-project-structure)
+- [Getting Started](#-getting-started)
+- [Available Commands](#-available-commands)
+- [Configuration](#-configuration)
+- [License](#-license)
+- [Author](#-author)
 
 ---
 
-## 📁 Структура проєкту
+## ✨ Features
+
+- **Difficulty level customization** — add as many rings to the game as you see fit
+- **Timer** — time limit depending on the chosen difficulty
+- **Scoreboard** — player statistics saved in `localStorage`
+- **Game statistics** — move count, efficiency, and time tracking
+- **Responsive UI** — the game works great on any screen size
+
+---
+
+## 📁 Project Structure
 
 ```
 hanoi-tower/
-├── docs/                    # Документація
+├── docs/                    # Documentation
 ├── src/
-│   ├── assets/              # Зображення та медіа-ресурси
+│   ├── assets/              # Images and media resources
 │   ├── components/
-│   │   ├── common/          # Перевикористовувані UI-компоненти (Button, Card тощо)
-│   │   ├── game/            # Компоненти ігрової логіки (Disk, Tower, HanoiGame тощо)
-│   │   └── layout/          # Компоненти макету сторінки
-│   ├── constants/           # Ігрові константи та конфігурація складності
-│   ├── hooks/               # Кастомні React-хуки (useGame, useTimer тощо)
-│   ├── pages/               # Сторінки додатку (Start, Game, Scoreboard, Score тощо)
-│   ├── stores/              # Zustand-стори (налаштування гри, стан гри, результати)
-│   ├── types/               # TypeScript-типи та інтерфейси
-│   ├── utils/               # Допоміжні утиліти (форматування часу тощо)
-│   ├── App.tsx              # Кореневий компонент із маршрутизацією
-│   ├── main.tsx             # Точка входу
-│   └── index.css            # Глобальні стилі
-├── eslint.config.js         # Конфігурація ESLint
-├── tsconfig.json            # Базова конфігурація TypeScript
-├── tsconfig.app.json        # TS-конфігурація для вихідного коду (src/)
-├── tsconfig.node.json       # TS-конфігурація для Node-файлів (vite.config.ts)
-├── vite.config.ts           # Конфігурація Vite
-├── package.json             # Залежності та скрипти
-└── index.html               # HTML-точка входу
+│   │   ├── common/          # Reusable UI components (Button, Card, etc.)
+│   │   ├── game/            # Game logic components (Disk, Tower, HanoiGame, etc.)
+│   │   └── layout/          # Page layout components
+│   ├── constants/           # Game constants and difficulty configuration
+│   ├── hooks/               # Custom React hooks (useGame, useTimer, etc.)
+│   ├── pages/               # Application pages (Start, Game, Scoreboard, Score, etc.)
+│   ├── stores/              # Zustand stores (game settings, game state, results)
+│   ├── types/               # TypeScript types and interfaces
+│   ├── utils/               # Utility helpers (time formatting, etc.)
+│   ├── App.tsx              # Root component with routing
+│   ├── main.tsx             # Entry point
+│   └── index.css            # Global styles
+├── eslint.config.js         # ESLint configuration
+├── tsconfig.json            # Base TypeScript configuration
+├── tsconfig.app.json        # TS configuration for source code (src/)
+├── tsconfig.node.json       # TS configuration for Node files (vite.config.ts)
+├── vite.config.ts           # Vite configuration
+├── package.json             # Dependencies and scripts
+└── index.html               # HTML entry point
 ```
 
 ---
 
-## 🚀 Початок роботи
+## 🚀 Getting Started
 
-### Попередні вимоги
+### Prerequisites
 
 - **Node.js** ≥ 18
 - **npm package manager**
 
-### Встановлення
+### Installation
 
 ```bash
-# Клонуйте репозиторій
-git clone <url-репозиторію>
+# Clone the repository
+git clone <repository-url>
 cd hanoitower
 
-# Встановіть залежності
+# Install dependencies
 npm install
 ```
 
-### Запуск у режимі розробки
+### Running in Development Mode
 
 ```bash
 npm run dev
 ```
 
-Додаток буде доступний за адресою, що з'явиться у терміналі (зазвичай `http://localhost:5173`).
+The application will be available at the address shown in the terminal (usually `http://localhost:5173`).
 
 ---
 
-## 📜 Доступні команди
+## 📜 Available Commands
 
-| Команда             | Опис                                                        |
+| Command             | Description                                                 |
 | ------------------- | ----------------------------------------------------------- |
-| `npm run dev`       | Запуск сервера розробки Vite з HMR                          |
-| `npm run build`     | Перевірка типів TypeScript та збірка проєкту для продакшену |
-| `npm run preview`   | Локальний перегляд продакшен-збірки                         |
-| `npm run lint`      | Запуск ESLint для перевірки якості коду                      |
+| `npm run dev`       | Start the Vite development server with HMR                  |
+| `npm run build`     | TypeScript type checking and production build                |
+| `npm run preview`   | Local preview of the production build                        |
+| `npm run lint`      | Run ESLint to check code quality                             |
 
 ---
 
-## ⚙ Конфігурація
+## ⚙ Configuration
 
 ### Vite (`vite.config.ts`)
 
-Збірник проєкту. Використовує плагіни:
-- `@vitejs/plugin-react` — плагін для підтримки React
-- `@tailwindcss/vite` — інтеграція Tailwind CSS
+The project bundler. Uses the following plugins:
+- `@vitejs/plugin-react` — plugin for React support
+- `@tailwindcss/vite` — Tailwind CSS integration
 
 ### TypeScript
 
-Конфігурація розділена на три файли:
-- **`tsconfig.json`** — базовий файл, що посилається на два дочірні
-- **`tsconfig.app.json`** — налаштування TypeScript для клієнтського React-застосунку (`src/`)
-- **`tsconfig.node.json`** — налаштування TypeScript для Node-частини проєктуx (`vite.config.ts`)
+The configuration is split into three files:
+- **`tsconfig.json`** — base file that references two child configs
+- **`tsconfig.app.json`** — TypeScript settings for the client-side React application (`src/`)
+- **`tsconfig.node.json`** — TypeScript settings for the Node part of the project (`vite.config.ts`)
 
 ### ESLint (`eslint.config.js`)
 
-Лінтер для підтримки якості коду. Застосовані набори правил:
-- `@eslint/js` — рекомендовані базові правила
-- `typescript-eslint` — правила для TypeScript
-- `eslint-plugin-react-hooks` — перевірка правил хуків React
-- `eslint-plugin-react-refresh` — сумісність з Vite HMR
+Linter for maintaining code quality. Applied rule sets:
+- `@eslint/js` — recommended base rules
+- `typescript-eslint` — TypeScript rules
+- `eslint-plugin-react-hooks` — React hooks rules validation
+- `eslint-plugin-react-refresh` — Vite HMR compatibility
 
-Ігнорується директорія `dist/`.
+The `dist/` directory is ignored.
 
 ### Tailwind CSS
 
-Версія 4 із вбудованою інтеграцією через Vite-плагін. Стилі імпортуються в `src/index.css`.
+Version 4 with built-in integration via the Vite plugin. Styles are imported in `src/index.css`.
 
 ---
 
-## 📄 Ліцензія
+## 📄 License
+This project is licensed under the MIT License.
 
-Деталі ліцензування наведено у файлі [LICENSE](./LICENSE).
+Licensing details are provided in the [LICENSE](./LICENSE) file.
+
+A full dependency license report is available in [LICENSE_REPORT.md](./LICENSE_REPORT.md)
 
 ---
 
-## 👤 Автор
+## 👤 Author
 
-**Ліневич Денис** — студент групи **ІПЗ-23-1**
+**Denys Linevych** — student of group **IPZ-23-1**
