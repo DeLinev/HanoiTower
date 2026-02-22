@@ -6,7 +6,7 @@
 
 This Privacy Policy describes how the Hanoi Tower web application (hereinafter referred to as "the Website") collects, uses, and protects information when you use our browser-based Tower of Hanoi puzzle game. This Privacy Policy is drafted in accordance with the **General Data Protection Regulation (EU) 2016/679 (GDPR)**. We are committed to protecting your privacy and being transparent about the data we handle.
 
-In this document, **"we"**, **"us"**, and **"our"** refer to the developer and maintainer of the Website — Denys Linevych — who also acts as the Data Controller. **"You"** and **"your"** refer to the individual using the Website.
+In this document, **"we"**, **"us"**, and **"our"** refer to the developer and maintainer of the Website - Denys Linevych - who also acts as the Data Controller. **"You"** and **"your"** refer to the individual using the Website.
 
 ### 1.1 Data Controller
 
@@ -56,9 +56,9 @@ All collected data is used exclusively for the following purposes:
 
 | Purpose | Legal Basis (GDPR) |
 |---|---|
-| Provide core game functionality (saving settings, tracking scores). | Legitimate interest — necessary for the service to function as expected (Art. 6(1)(f) GDPR). |
-| Remember your cookie consent preferences. | Legal obligation — compliance with applicable cookie/privacy regulations (Art. 6(1)(c) GDPR). |
-| Collect anonymized performance analytics (only with your consent). | Consent — your explicit consent via the cookie consent banner (Art. 6(1)(a) GDPR). |
+| Provide core game functionality (saving settings, tracking scores). | Legitimate interest - necessary for the service to function as expected (Art. 6(1)(f) GDPR). |
+| Remember your cookie consent preferences. | Legal obligation - compliance with applicable cookie/privacy regulations (Art. 6(1)(c) GDPR). |
+| Collect anonymized performance analytics (only with your consent). | Consent - your explicit consent via the cookie consent banner (Art. 6(1)(a) GDPR). |
 
 ## 4. Data Storage and Security
 
@@ -80,15 +80,15 @@ We do not impose any server-side retention period because no data is stored on o
 
 In accordance with Articles 15–22 of the GDPR, you have the following rights regarding your personal data. Since all data is stored locally in your browser, you can exercise most of these rights directly without contacting us:
 
-- **Right of access (Art. 15)** — Your game statistics and scoreboard are visible within the Website interface at any time.
-- **Right to rectification (Art. 16)** — Since all data is stored locally, you can modify it directly through your browser's developer tools or by clearing and re-entering your information.
-- **Right to erasure / "Right to be forgotten" (Art. 17)** — You may clear the scoreboard at any time using the in-app "Clear Scoreboard" button. You can also clear all Website data through your browser's settings (clearing cookies, site data, and Local Storage).
-- **Right to restriction of processing (Art. 18)** — You can configure your browser to block cookies or disable Local Storage entirely. Please note that this may impair the functionality of the Website (e.g., settings and scores will not persist between sessions).
-- **Right to data portability (Art. 20)** — All data is stored in standard browser storage formats (JSON in Local Storage, standard cookies) and can be exported using your browser's developer tools.
-- **Right to object (Art. 21)** — You can disable analytics cookies at any time through the cookie settings/preferences modal accessible on the Website.
-- **Manage cookie preferences** — You can change your cookie consent preferences at any time through the cookie consent modal.
-- **Use the Website anonymously** — You may enter any nickname or pseudonym; no identity verification is performed.
-- **Right to lodge a complaint (Art. 77)** — You have the right to lodge a complaint with a supervisory data protection authority if you believe your data is being processed unlawfully.
+- **Right of access (Art. 15)** - Your game statistics and scoreboard are visible within the Website interface at any time.
+- **Right to rectification (Art. 16)** - Since all data is stored locally, you can modify it directly through your browser's developer tools or by clearing and re-entering your information.
+- **Right to erasure / "Right to be forgotten" (Art. 17)** - You may clear the scoreboard at any time using the in-app "Clear Scoreboard" button. You can also clear all Website data through your browser's settings (clearing cookies, site data, and Local Storage).
+- **Right to restriction of processing (Art. 18)** - You can configure your browser to block cookies or disable Local Storage entirely. Please note that this may impair the functionality of the Website (e.g., settings and scores will not persist between sessions).
+- **Right to data portability (Art. 20)** - All data is stored in standard browser storage formats (JSON in Local Storage, standard cookies) and can be exported using your browser's developer tools.
+- **Right to object (Art. 21)** - You can disable analytics cookies at any time through the cookie settings/preferences modal accessible on the Website.
+- **Manage cookie preferences** - You can change your cookie consent preferences at any time through the cookie consent modal.
+- **Use the Website anonymously** - You may enter any nickname or pseudonym; no identity verification is performed.
+- **Right to lodge a complaint (Art. 77)** - You have the right to lodge a complaint with a supervisory data protection authority if you believe your data is being processed unlawfully.
 
 ## 6. Children's Privacy
 

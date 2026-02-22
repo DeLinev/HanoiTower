@@ -1,5 +1,5 @@
 # 🏯 Tower of Hanoi
-![alt text](./docs/images/game.png)
+![alt text](./docs-site/static/img/game.png)
 
 Tower of Hanoi is a game that implements the classic **"Tower of Hanoi"** puzzle. The player moves disks between three pegs, following the rule: a larger disk cannot be placed on top of a smaller one. It supports difficulty level customization, a timer, a scoring system, and a scoreboard.
 
@@ -19,11 +19,11 @@ Tower of Hanoi is a game that implements the classic **"Tower of Hanoi"** puzzle
 
 ## ✨ Features
 
-- **Difficulty level customization** — add as many rings to the game as you see fit
-- **Timer** — time limit depending on the chosen difficulty
-- **Scoreboard** — player statistics saved in `localStorage`
-- **Game statistics** — move count, efficiency, and time tracking
-- **Responsive UI** — the game works great on any screen size
+- **Difficulty level customization** - add as many rings to the game as you see fit
+- **Timer** - time limit depending on the chosen difficulty
+- **Scoreboard** - player statistics saved in `localStorage`
+- **Game statistics** - move count, efficiency, and time tracking
+- **Responsive UI** - the game works great on any screen size
 
 ---
 
@@ -102,23 +102,23 @@ The application will be available at the address shown in the terminal (usually 
 ### Vite (`vite.config.ts`)
 
 The project bundler. Uses the following plugins:
-- `@vitejs/plugin-react` — plugin for React support
-- `@tailwindcss/vite` — Tailwind CSS integration
+- `@vitejs/plugin-react` - plugin for React support
+- `@tailwindcss/vite` - Tailwind CSS integration
 
 ### TypeScript
 
 The configuration is split into three files:
-- **`tsconfig.json`** — base file that references two child configs
-- **`tsconfig.app.json`** — TypeScript settings for the client-side React application (`src/`)
-- **`tsconfig.node.json`** — TypeScript settings for the Node part of the project (`vite.config.ts`)
+- **`tsconfig.json`** - base file that references two child configs
+- **`tsconfig.app.json`** - TypeScript settings for the client-side React application (`src/`)
+- **`tsconfig.node.json`** - TypeScript settings for the Node part of the project (`vite.config.ts`)
 
 ### ESLint (`eslint.config.js`)
 
 Linter for maintaining code quality. Applied rule sets:
-- `@eslint/js` — recommended base rules
-- `typescript-eslint` — TypeScript rules
-- `eslint-plugin-react-hooks` — React hooks rules validation
-- `eslint-plugin-react-refresh` — Vite HMR compatibility
+- `@eslint/js` - recommended base rules
+- `typescript-eslint` - TypeScript rules
+- `eslint-plugin-react-hooks` - React hooks rules validation
+- `eslint-plugin-react-refresh` - Vite HMR compatibility
 
 The `dist/` directory is ignored.
 
@@ -139,4 +139,4 @@ A full dependency license report is available in [LICENSE_REPORT.md](./LICENSE_R
 
 ## 👤 Author
 
-**Denys Linevych** — student of group **IPZ-23-1**
+**Denys Linevych**
