@@ -56,7 +56,7 @@ npm run build
 
 ## License
 
-This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/denys-linevych/hanoi-tower/blob/main/LICENSE) file for details.
+This project is licensed under the **MIT License**. See the [LICENSE](https://github.com/DeLinev/HanoiTower/blob/main/LICENSE) file for details.
 
 A full dependency license report is available in `LICENSE_REPORT.md`.
 
