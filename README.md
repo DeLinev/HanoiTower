@@ -12,6 +12,7 @@ Tower of Hanoi is a game that implements the classic **"Tower of Hanoi"** puzzle
 - [Getting Started](#-getting-started)
 - [Available Commands](#-available-commands)
 - [Configuration](#-configuration)
+- [Privacy Policy](#-privacy-policy)
 - [License](#-license)
 - [Author](#-author)
 
@@ -127,6 +128,9 @@ The `dist/` directory is ignored.
 Version 4 with built-in integration via the Vite plugin. Styles are imported in `src/index.css`.
 
 ---
+
+## 📃 Docs Video
+[Here](https://drive.google.com/file/d/1hXxXg-AyRt6k49LJHp8_t7HqJXnfQ2-n/view?usp=sharing)
 
 ## 📝 Privacy Policy
 You can find Privacy Policy [here](./PRIVACY_POLICY.md)
