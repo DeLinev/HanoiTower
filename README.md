@@ -128,12 +128,17 @@ Version 4 with built-in integration via the Vite plugin. Styles are imported in 
 
 ---
 
+## 📝 Privacy Policy
+You can find Privacy Policy [here](./PRIVACY_POLICY.md)
+
 ## 📄 License
 This project is licensed under the MIT License.
 
 Licensing details are provided in the [LICENSE](./LICENSE) file.
 
-A full dependency license report is available in [LICENSE_REPORT.md](./LICENSE_REPORT.md)
+A full dependency license report is available in [LICENSE_REPORT.md](./LICENSE_REPORT.md).
+
+Third-party attribution notices are provided in [THIRD_PARTY_NOTICES.md](./THIRD_PARTY_NOTICES.md). No modifications have been made to the referenced third-party packages.
 
 ---
 
