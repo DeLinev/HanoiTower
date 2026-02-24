@@ -5,6 +5,14 @@ import "vanilla-cookieconsent/dist/cookieconsent.css";
 export default function CookiePopup() {
     useEffect(() => {
         CookieConsent.run({
+            disablePageInteraction: true,
+            guiOptions: {
+                consentModal: {
+                    layout: "box",
+                    position: "middle center",
+                    equalWeightButtons: true,
+                }
+            },
 
             categories: {
                 necessary: {
@@ -24,13 +32,13 @@ export default function CookiePopup() {
                             title: 'We use cookies',
                             description: 'We use cookies to improve the performance of our website. You can manage your settings.',
                             acceptAllBtn: 'Accept all',
-                            acceptNecessaryBtn: 'Reject all',
+                            acceptNecessaryBtn: 'Only accept necessary',
                             showPreferencesBtn: 'Manage Individual preferences'
                         },
                         preferencesModal: {
                             title: 'Manage cookie preferences',
                             acceptAllBtn: 'Accept all',
-                            acceptNecessaryBtn: 'Reject all',
+                            acceptNecessaryBtn: 'Only accept necessary',
                             savePreferencesBtn: 'Accept current selection',
                             closeIconLabel: 'Close modal',
                             sections: [
@@ -59,7 +67,10 @@ export default function CookiePopup() {
             },
             
             onConsent: ({cookie}) => {
-                cookieStore.set("necessary-cookie", "Necessary Hello, World!");
+                if (cookie.categories.find(c => c === "necessary"))
+                    cookieStore.set("necessary-cookie", "Necessary Hello, World!");
+                else
+                    cookieStore.delete("necessary-cookie");
 
                 if (cookie.categories.find(c => c === "analytics"))
                     cookieStore.set("analytics-cookie", "Analytics Hello, World!");
