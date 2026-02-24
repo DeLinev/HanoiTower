@@ -40,17 +40,17 @@ export default function CookiePopup() {
                                 },
                                 {
                                     title: 'Strictly Necessary cookies',
-                                    description: 'These cookies are essential for the proper functioning of the website and cannot be disabled.',
+                                    description: '[For educational purposes only, we do not actually use cookies] These cookies are essential for the proper functioning of the website and cannot be disabled.',
                                     linkedCategory: 'necessary'
                                 },
                                 {
                                     title: 'Performance and Analytics',
-                                    description: 'These cookies collect information about how you use our website. All of the data is anonymized and cannot be used to identify you.',
+                                    description: '[For educational purposes only, we do not actually use cookies] These cookies collect information about how you use our website. All of the data is anonymized and cannot be used to identify you.',
                                     linkedCategory: 'analytics'
                                 },
                                 {
                                     title: 'More information',
-                                    description: 'For any queries in relation to my policy on cookies and your choices, please <a href="#contact-page">contact us</a>'
+                                    description: 'For any queries in relation to my policy on cookies and your choices, please <a href="https://github.com/DeLinev/HanoiTower/issues">contact us</a>'
                                 }
                             ]
                         }
