@@ -53,3 +53,9 @@ export type PlayerScore = {
 }
 
 export type Scoreboard = PlayerScore[];
+
+export type DragItem = {
+    diskId: number;
+    diskSize: number;
+    fromTowerId: number;
+};

@@ -43,7 +43,10 @@ export function GamePage() {
         timePassed,
         timeRemaining,
         isTimerRunning,
+        isGameActive,
         handleTowerSelect,
+        handleDiskDrop,
+        canDropOnTower,
         resetGame,
         pauseGame,
         resumeGame,
@@ -63,7 +66,12 @@ export function GamePage() {
                 onResume={resumeGame}
             />
 
-            <HanoiGame onTowerSelect={handleTowerSelect} />
+            <HanoiGame
+                onTowerSelect={handleTowerSelect}
+                onDiskDrop={handleDiskDrop}
+                canDropOnTower={canDropOnTower}
+                isGameActive={isGameActive}
+            />
 
             {showModal &&
                 <Portal>

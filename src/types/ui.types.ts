@@ -1,5 +1,5 @@
 import type { ElementType, ReactNode } from "react"
-import type { Difficulty, GameStatistic, Tower } from "./game.types"
+import type { Difficulty, Disk, GameStatistic, Tower } from "./game.types"
 
 export type DifficultyProps = {
     diff: Difficulty,
@@ -40,10 +40,23 @@ export type GameControlsProps = {
 
 export type HanoiGameProps = {
     onTowerSelect: (towerId: number) => void;
+    onDiskDrop: (fromTowerId: number, toTowerId: number) => void;
+    canDropOnTower: (fromTowerId: number, toTowerId: number) => boolean;
+    isGameActive: boolean;
 }
 
 export type TowerProps = { 
     tower: Tower, 
     onClick: () => void, 
-    isSelected: boolean 
+    isSelected: boolean,
+    onDiskDrop: (fromTowerId: number, toTowerId: number) => void;
+    canDropOnTower: (fromTowerId: number, toTowerId: number) => boolean;
+    isGameActive: boolean;
+}
+
+export type DiskComponentProps = {
+    disk: Disk;
+    towerId: number;
+    isTopDisk: boolean;
+    isGameActive: boolean;
 }
