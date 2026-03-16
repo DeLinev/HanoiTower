@@ -1,6 +1,6 @@
 import { Layout } from "../components/layout/Layout";
 import { GameControls } from "../components/game/GameControls";
-import { HanoiGame } from "../components/game/HanoiGame";
+// import { HanoiGame } from "../components/game/HanoiGame";
 import { useGame } from "../hooks/useGame";
 import { useState } from "react";
 import Portal from "../components/common/Portal";
@@ -9,11 +9,12 @@ import { ResultsPage } from "./ResultsPage";
 import useLocalStorage from "../hooks/useLocalStorage";
 import { useGameSettingsStore } from "../stores/useGameSettingsStore";
 import { useScoreboardStore } from "../stores/useScoreboardStore";
+import { Scene } from "../components/game3d/Scene";
 
 export function GamePage() {
     const { difficulty } = useGameSettingsStore();
     const { addRecord } = useScoreboardStore();
-    const [ currentPlayer ] = useLocalStorage<string>("currentPlayer", "Player1");
+    const [currentPlayer] = useLocalStorage<string>("currentPlayer", "Player1");
 
     const handleGameComplete = (movesCount: number, timePassed: number, timeRemaining: number | null, isGameWon: boolean) => {
         const minMoves = Math.pow(2, difficulty.disks) - 1;
@@ -57,21 +58,30 @@ export function GamePage() {
 
     return (
         <Layout>
-            <GameControls 
+            <GameControls
                 timePassed={timePassed}
                 timeRemaining={timeRemaining}
                 isTimerRunning={isTimerRunning}
                 onReset={resetGame}
                 onPause={pauseGame}
                 onResume={resumeGame}
+                className="absolute left-1/2 -translate-x-1/2 z-10"
             />
 
-            <HanoiGame
+            {/* <HanoiGame
                 onTowerSelect={handleTowerSelect}
                 onDiskDrop={handleDiskDrop}
                 canDropOnTower={canDropOnTower}
                 isGameActive={isGameActive}
-            />
+            /> */}
+            <div className="w-full h-full">
+                <Scene 
+                    onTowerSelect={handleTowerSelect}
+                    onDiskDrop={handleDiskDrop}
+                    canDropOnTower={canDropOnTower}
+                    isGameActive={isGameActive}
+                />
+            </div>
 
             {showModal &&
                 <Portal>

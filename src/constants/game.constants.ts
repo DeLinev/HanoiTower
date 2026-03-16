@@ -14,3 +14,7 @@ export const gameStateDefaultValue: GameState = {
     selectedTower: null,
     difficulty: difficulties[1]
 }
+
+export function getDisk3dThickness(diskSize: number) {
+    return diskSize * 0.2 + 1;
+}

@@ -36,6 +36,7 @@ export type GameControlsProps = {
     onReset: () => void;
     onPause: () => void;
     onResume: () => void;
+    className?: string;
 }
 
 export type HanoiGameProps = {
@@ -54,9 +55,17 @@ export type TowerProps = {
     isGameActive: boolean;
 }
 
+export type Tower3dProps = TowerProps & {
+    position: [number, number, number];
+}
+
 export type DiskComponentProps = {
     disk: Disk;
     towerId: number;
     isTopDisk: boolean;
     isGameActive: boolean;
+}
+
+export type Disk3dComponentProps = DiskComponentProps & {
+    position: [number, number, number];
 }
