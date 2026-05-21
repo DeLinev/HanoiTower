@@ -57,6 +57,7 @@ export type TowerProps = {
 
 export type Tower3dProps = TowerProps & {
     position: [number, number, number];
+    towerPositions: [number, number, number][];
 }
 
 export type DiskComponentProps = {
@@ -68,4 +69,7 @@ export type DiskComponentProps = {
 
 export type Disk3dComponentProps = DiskComponentProps & {
     position: [number, number, number];
+    towerPositions: [number, number, number][];
+    onDiskDrop: (fromTowerId: number, toTowerId: number) => void;
+    canDropOnTower: (fromTowerId: number, toTowerId: number) => boolean;
 }

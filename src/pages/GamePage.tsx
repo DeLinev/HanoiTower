@@ -55,7 +55,7 @@ export function GamePage() {
 
     const [showModal, setShowModal] = useState(false);
     const [gameStats, setGameStats] = useState<GameStatistic | null>(null);
-
+    
     return (
         <Layout>
             <GameControls
@@ -65,7 +65,7 @@ export function GamePage() {
                 onReset={resetGame}
                 onPause={pauseGame}
                 onResume={resumeGame}
-                className="absolute left-1/2 -translate-x-1/2 z-10"
+                // className="absolute left-1/2 -translate-x-1/2 z-10"
             />
 
             {/* <HanoiGame
