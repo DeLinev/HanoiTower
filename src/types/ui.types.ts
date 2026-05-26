@@ -55,9 +55,11 @@ export type TowerProps = {
     isGameActive: boolean;
 }
 
-export type Tower3dProps = TowerProps & {
+export type Tower3dProps = {
+    tower: Tower;
     position: [number, number, number];
-    towerPositions: [number, number, number][];
+    onClick: () => void;
+    isSelected: boolean;
 }
 
 export type DiskComponentProps = {
@@ -68,8 +70,9 @@ export type DiskComponentProps = {
 }
 
 export type Disk3dComponentProps = DiskComponentProps & {
-    position: [number, number, number];
+    targetPosition: [number, number, number];
     towerPositions: [number, number, number][];
     onDiskDrop: (fromTowerId: number, toTowerId: number) => void;
     canDropOnTower: (fromTowerId: number, toTowerId: number) => boolean;
+    getDropTargetY: (towerId: number) => number;
 }

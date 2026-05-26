@@ -1,79 +1,262 @@
-import { useMemo, useRef, useEffect } from "react";
+import { useMemo, useRef, useEffect, useCallback } from "react";
 import type { Disk3dComponentProps } from "../../types/ui.types";
 import * as THREE from "three";
 import { getDisk3dThickness } from "../../constants/game.constants";
-import { useSpring, animated } from "@react-spring/three";
-import { useDrag } from "@use-gesture/react";
+import { useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 
+// ── constants ────────────────────────────────────────────────────
+/** Invisible plane at z = 0 used to project the pointer into world space. */
 const dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-const intersectPoint = new THREE.Vector3();
+/** Max X‑distance (world units) from a tower center for a drop to register. */
+const SNAP_THRESHOLD = 9;
+/** Y coordinate the disk lifts to during the fly‑over animation. */
+const LIFT_Y = 14;
+/**
+ * Exponential‑lerp speed factor.  Higher = faster convergence.
+ *   5 → ~95 % in 0.6 s     10 → ~95 % in 0.3 s     15 → ~95 % in 0.2 s
+ */
+const LERP_SPEED = 15;
+/** Distance below which we "snap" exactly to a waypoint target. */
+const WAYPOINT_SNAP = 0.12;
 
-export default function Disk3d({ disk, towerId, isTopDisk, isGameActive, position, towerPositions, onDiskDrop, canDropOnTower }: Disk3dComponentProps) {
-    // 1. Create a lock to protect the spring from parent re-renders
-    const isDragging = useRef(false);
+// ── types ────────────────────────────────────────────────────────
+type Phase = "idle" | "dragging" | "animating";
 
-    const [spring, api] = useSpring(() => ({
-        position: position,
-        config: { friction: 20, tension: 200 }
-    }));
+// ─────────────────────────────────────────────────────────────────
+export default function Disk3d({
+    disk,
+    towerId,
+    isTopDisk,
+    isGameActive,
+    targetPosition,
+    towerPositions,
+    onDiskDrop,
+    canDropOnTower,
+    getDropTargetY,
+}: Disk3dComponentProps) {
+    // ── refs ──────────────────────────────────────────────────────
+    const meshRef = useRef<THREE.Mesh>(null!);
+    const phase = useRef<Phase>("idle");
 
-    // 2. Safely sync position changes from the parent ONLY if we aren't dragging
+    /** Where the idle lerp is heading. */
+    const idleTarget = useRef(new THREE.Vector3(...targetPosition));
+    /** Live cursor position while dragging. */
+    const dragPos = useRef(new THREE.Vector3());
+    /** Ordered list of positions the disk must visit after a drop. */
+    const waypoints = useRef<THREE.Vector3[]>([]);
+    const wpIndex = useRef(0);
+    /** Callback fired after the last waypoint is reached. */
+    const onAnimDone = useRef<(() => void) | null>(null);
+
+    /** Stored so we can clean up window listeners on unmount. */
+    const cleanupDrag = useRef<(() => void) | null>(null);
+
+    // Re-usable THREE objects – avoids GC churn in the hot path.
+    const raycaster = useRef(new THREE.Raycaster());
+    const ndc = useRef(new THREE.Vector2());
+    const planeHit = useRef(new THREE.Vector3());
+
+    const { camera, gl } = useThree();
+
+    // ── keep idle target in sync with game state ─────────────────
     useEffect(() => {
-        if (!isDragging.current) {
-            api.start({ position: position });
+        // Only overwrite the target when we're not mid-drag / mid-anim,
+        // so that a re-render during a spring animation can't teleport
+        // the disk.
+        if (phase.current === "idle") {
+            idleTarget.current.set(...targetPosition);
         }
-    }, [position, api]);
+    }, [targetPosition]);
 
-    const bind = useDrag(({ active, first, last, event }) => {
-        const r3fEvent = event as unknown as ThreeEvent<PointerEvent>;
+    // ── clean up listeners on unmount (e.g. game reset mid-drag) ─
+    useEffect(() => {
+        return () => { cleanupDrag.current?.(); };
+    }, []);
 
-        // 3. Lock the pointer to the mesh as soon as the click happens
-        if (first) {
-            isDragging.current = true;
-            (r3fEvent.target as any).setPointerCapture(r3fEvent.pointerId);
-        }
+    // ── pointer → world projection ──────────────────────────────
+    const screenToWorld = useCallback(
+        (sx: number, sy: number): THREE.Vector3 | null => {
+            const rect = gl.domElement.getBoundingClientRect();
+            ndc.current.set(
+                ((sx - rect.left) / rect.width) * 2 - 1,
+                -((sy - rect.top) / rect.height) * 2 + 1,
+            );
+            raycaster.current.setFromCamera(ndc.current, camera);
+            const hit = raycaster.current.ray.intersectPlane(dragPlane, planeHit.current);
+            return hit ? planeHit.current.clone() : null;
+        },
+        [camera, gl],
+    );
 
-        // Keep following the cursor while the drag is in progress.
-        if (active && r3fEvent.ray && isTopDisk && isGameActive) {
-            r3fEvent.ray.intersectPlane(dragPlane, intersectPoint);
-            api.start({
-                position: [intersectPoint.x, intersectPoint.y, 0]
+    // ── find nearest tower by X ─────────────────────────────────
+    const findNearestTower = useCallback(
+        (worldX: number) => {
+            let bestIdx = 0;
+            let bestDist = Infinity;
+            towerPositions.forEach((tp, i) => {
+                const d = Math.abs(tp[0] - worldX);
+                if (d < bestDist) { bestDist = d; bestIdx = i; }
             });
-        }
+            return { index: bestIdx, distance: bestDist };
+        },
+        [towerPositions],
+    );
 
-        // 4. Unlock everything ONLY when the mouse button is physically released
-        if (last) {
-            isDragging.current = false;
-            (r3fEvent.target as any).releasePointerCapture?.(r3fEvent.pointerId);
-            
-            // Your snap logic can safely go here once you uncomment it
+    // ── pointer down handler (R3F mesh event) ───────────────────
+    const handlePointerDown = useCallback(
+        (e: ThreeEvent<PointerEvent>) => {
+            if (!isTopDisk || !isGameActive || phase.current !== "idle") return;
+            e.stopPropagation();
+
+            phase.current = "dragging";
+
+            // Lift the disk to the cursor immediately
+            const w = screenToWorld(e.nativeEvent.clientX, e.nativeEvent.clientY);
+            if (w) dragPos.current.copy(w);
+
+            const canvas = gl.domElement;
+            canvas.style.cursor = "grabbing";
+
+            // ─── window listeners ────────────────────────────────
+            const onMove = (ev: PointerEvent) => {
+                const w = screenToWorld(ev.clientX, ev.clientY);
+                if (w) dragPos.current.copy(w);
+            };
+
+            const cleanup = () => {
+                canvas.removeEventListener("pointermove", onMove);
+                canvas.removeEventListener("pointerup", onUp);
+                canvas.removeEventListener("lostpointercapture", onLostCapture);
+                canvas.style.cursor = "";
+                cleanupDrag.current = null;
+            };
+
+            const onUp = (ev: PointerEvent) => {
+                cleanup();
+                try { canvas.releasePointerCapture(ev.pointerId); } catch { /* ok */ }
+                if (phase.current !== "dragging") return;
+
+                // ── decide where the disk goes ───────────────────
+                const dropX = dragPos.current.x;
+                const { index: nearest, distance } = findNearestTower(dropX);
+
+                const valid =
+                    distance < SNAP_THRESHOLD &&
+                    nearest !== towerId &&
+                    canDropOnTower(towerId, nearest);
+
+                if (valid) {
+                    // Build a 3-step arc: lift → fly → drop
+                    const targetX = towerPositions[nearest][0];
+                    const targetY = getDropTargetY(nearest);
+                    const curPos = meshRef.current.position;
+                    waypoints.current = [
+                        new THREE.Vector3(curPos.x, LIFT_Y, 0),   // 1. lift
+                        new THREE.Vector3(targetX,  LIFT_Y, 0),   // 2. fly
+                        new THREE.Vector3(targetX,  targetY, 0),  // 3. drop
+                    ];
+                    wpIndex.current = 0;
+                    phase.current = "animating";
+                    onAnimDone.current = () => {
+                        // Commit the move AFTER the full animation plays.
+                        onDiskDrop(towerId, nearest);
+                    };
+                } else {
+                    // Invalid / same tower → glide back
+                    waypoints.current = [
+                        new THREE.Vector3(...targetPosition),
+                    ];
+                    wpIndex.current = 0;
+                    phase.current = "animating";
+                    onAnimDone.current = null;
+                }
+            };
+
+            const onLostCapture = () => {
+                cleanup();
+                // Return disk to its resting position.
+                waypoints.current = [new THREE.Vector3(...targetPosition)];
+                wpIndex.current = 0;
+                phase.current = "animating";
+                onAnimDone.current = null;
+            };
+
+            canvas.addEventListener("pointermove", onMove);
+            canvas.addEventListener("pointerup", onUp);
+            canvas.addEventListener("lostpointercapture", onLostCapture);
+            cleanupDrag.current = cleanup;
+
+            try { canvas.setPointerCapture(e.nativeEvent.pointerId); } catch { /* ok */ }
+        },
+        // Dependencies – all values read inside the closures:
+        [isTopDisk, isGameActive, towerId, towerPositions,
+         canDropOnTower, onDiskDrop, getDropTargetY,
+         targetPosition, screenToWorld, findNearestTower, gl],
+    );
+
+    // ── per-frame animation loop ────────────────────────────────
+    useFrame((_, delta) => {
+        if (!meshRef.current) return;
+        const pos = meshRef.current.position;
+
+        // Frame-rate-independent exponential lerp factor.
+        const t = 1 - Math.exp(-LERP_SPEED * delta);
+
+        switch (phase.current) {
+            // ── DRAGGING: hard-follow the cursor ─────────────────
+            case "dragging":
+                pos.copy(dragPos.current);
+                break;
+
+            // ── ANIMATING: step through waypoints with lerp ──────
+            case "animating": {
+                const wp = waypoints.current[wpIndex.current];
+                if (!wp) { phase.current = "idle"; break; }
+
+                pos.lerp(wp, t);
+
+                if (pos.distanceTo(wp) < WAYPOINT_SNAP) {
+                    pos.copy(wp);           // snap exactly
+                    wpIndex.current += 1;
+
+                    if (wpIndex.current >= waypoints.current.length) {
+                        phase.current = "idle";
+                        // Sync idle target to wherever the animation ended
+                        // (prevents a one‑frame drift before the useEffect
+                        //  fires with the new targetPosition from the store).
+                        idleTarget.current.copy(pos);
+                        onAnimDone.current?.();
+                        onAnimDone.current = null;
+                    }
+                }
+                break;
+            }
+
+            // ── IDLE: gently converge on the rest position ───────
+            case "idle":
+            default:
+                pos.lerp(idleTarget.current, t);
+                break;
         }
     });
 
+    // ── geometry ─────────────────────────────────────────────────
     const width = 2;
 
     const colors = [
-        '#ff0000',   // red
-        '#ff9800',   // orange
-        '#ffff00',   // yellow
-        '#4caf50',   // green
-        '#2196f3',   // blue
-        '#3f51b5',   // indigo
-        '#9c27b0',   // purple
-        '#e91e63',   // pink
+        "#ff0000", "#ff9800", "#ffff00", "#4caf50",
+        "#2196f3", "#3f51b5", "#9c27b0", "#e91e63",
     ];
-
     const color = colors[disk.size - 1] || colors[0];
 
-    const calculatedWidth = width + (disk.size * 0.5);
+    const calculatedWidth = width + disk.size * 0.5;
     const outerRadius = calculatedWidth < 2 ? 2 : calculatedWidth;
     const innerRadius = 1;
     const thickness = getDisk3dThickness(disk.size);
 
     const geometry = useMemo(() => {
-        const edge = thickness * 0.3
-
+        const edge = thickness * 0.3;
         const path = new THREE.Path();
 
         path.moveTo(innerRadius, 0);
@@ -84,13 +267,29 @@ export default function Disk3d({ disk, towerId, isTopDisk, isGameActive, positio
         path.lineTo(innerRadius, thickness);
 
         const points = path.getPoints(64);
+        return new THREE.LatheGeometry(points, 64);
+    }, [outerRadius, innerRadius, thickness]);
 
-        return new THREE.LatheGeometry(points, 64)
-    }, [outerRadius, innerRadius, thickness])
-
+    // ── render ───────────────────────────────────────────────────
     return (
-        <animated.mesh {...spring} {...bind()} geometry={geometry} castShadow>
+        <mesh
+            ref={meshRef}
+            position={targetPosition}
+            onPointerDown={handlePointerDown}
+            onPointerOver={() => {
+                if (isTopDisk && isGameActive && phase.current === "idle") {
+                    gl.domElement.style.cursor = "grab";
+                }
+            }}
+            onPointerOut={() => {
+                if (phase.current !== "dragging") {
+                    gl.domElement.style.cursor = "";
+                }
+            }}
+            geometry={geometry}
+            castShadow
+        >
             <meshStandardMaterial color={color} side={THREE.DoubleSide} />
-        </animated.mesh>
-    )
+        </mesh>
+    );
 }
