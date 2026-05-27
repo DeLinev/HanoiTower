@@ -8,7 +8,6 @@ import * as THREE from "three";
 import Tower3d from "./Tower3d";
 import Disk3d from "./Disk3d";
 
-// ── lighting ─────────────────────────────────────────────────────
 function Light() {
     const lightRef = useRef<THREE.SpotLight>(null!)
 
@@ -29,7 +28,6 @@ function Light() {
     )
 }
 
-// ── scene ────────────────────────────────────────────────────────
 export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive }: HanoiGameProps) {
     const gameState = useGameStateStore(state => state.gameState);
     const towerSpacing = 18;
@@ -37,12 +35,11 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
 
     // X / Y / Z base position for each tower rod.
     const towerPositions = useMemo(() => {
-        return gameState.towers.map((_, index) => 
+        return Array.from({ length: gameState.towers.length }, (_, index) =>
             [(index - centerIndex) * towerSpacing, 5, 0] as [number, number, number]
         );
     }, [gameState.towers.length, centerIndex, towerSpacing]);
 
-    // ── flat list of every disk with its computed resting position ─
     const allDiskData = useMemo(() => {
         const DISK_BASE_Y = 0.26; // just above the ground box
 
@@ -107,7 +104,6 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                 <meshStandardMaterial color="#a37858" />
             </mesh>
 
-            {/* ── tower rods (no disks) ───────────────────────── */}
             {gameState.towers.map((tower) => (
                 <Tower3d
                     key={tower.id}
@@ -118,7 +114,6 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                 />
             ))}
 
-            {/* ── all disks rendered here (flat, not nested) ──── */}
             {allDiskData.map(({ disk, towerId, isTopDisk, targetPosition }) => (
                 <Disk3d
                     key={disk.id}

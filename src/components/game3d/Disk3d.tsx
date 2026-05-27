@@ -5,7 +5,6 @@ import { getDisk3dThickness } from "../../constants/game.constants";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 
-// ── constants ────────────────────────────────────────────────────
 /** Invisible plane at z = 0 used to project the pointer into world space. */
 const dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 /** Max X‑distance (world units) from a tower center for a drop to register. */
@@ -16,14 +15,12 @@ const LIFT_Y = 14;
  * Exponential‑lerp speed factor.  Higher = faster convergence.
  *   5 → ~95 % in 0.6 s     10 → ~95 % in 0.3 s     15 → ~95 % in 0.2 s
  */
-const LERP_SPEED = 15;
+const LERP_SPEED = 20;
 /** Distance below which we "snap" exactly to a waypoint target. */
 const WAYPOINT_SNAP = 0.12;
 
-// ── types ────────────────────────────────────────────────────────
 type Phase = "idle" | "dragging" | "animating";
 
-// ─────────────────────────────────────────────────────────────────
 export default function Disk3d({
     disk,
     towerId,
@@ -35,7 +32,6 @@ export default function Disk3d({
     canDropOnTower,
     getDropTargetY,
 }: Disk3dComponentProps) {
-    // ── refs ──────────────────────────────────────────────────────
     const meshRef = useRef<THREE.Mesh>(null!);
     const phase = useRef<Phase>("idle");
 
@@ -59,7 +55,6 @@ export default function Disk3d({
 
     const { camera, gl } = useThree();
 
-    // ── keep idle target in sync with game state ─────────────────
     useEffect(() => {
         // Only overwrite the target when we're not mid-drag / mid-anim,
         // so that a re-render during a spring animation can't teleport
@@ -69,12 +64,10 @@ export default function Disk3d({
         }
     }, [targetPosition]);
 
-    // ── clean up listeners on unmount (e.g. game reset mid-drag) ─
     useEffect(() => {
         return () => { cleanupDrag.current?.(); };
     }, []);
 
-    // ── pointer → world projection ──────────────────────────────
     const screenToWorld = useCallback(
         (sx: number, sy: number): THREE.Vector3 | null => {
             const rect = gl.domElement.getBoundingClientRect();
@@ -89,7 +82,6 @@ export default function Disk3d({
         [camera, gl],
     );
 
-    // ── find nearest tower by X ─────────────────────────────────
     const findNearestTower = useCallback(
         (worldX: number) => {
             let bestIdx = 0;
@@ -103,7 +95,6 @@ export default function Disk3d({
         [towerPositions],
     );
 
-    // ── pointer down handler (R3F mesh event) ───────────────────
     const handlePointerDown = useCallback(
         (e: ThreeEvent<PointerEvent>) => {
             if (!isTopDisk || !isGameActive || phase.current !== "idle") return;
@@ -118,7 +109,6 @@ export default function Disk3d({
             const canvas = gl.domElement;
             canvas.style.cursor = "grabbing";
 
-            // ─── window listeners ────────────────────────────────
             const onMove = (ev: PointerEvent) => {
                 const w = screenToWorld(ev.clientX, ev.clientY);
                 if (w) dragPos.current.copy(w);
@@ -137,7 +127,6 @@ export default function Disk3d({
                 try { canvas.releasePointerCapture(ev.pointerId); } catch { /* ok */ }
                 if (phase.current !== "dragging") return;
 
-                // ── decide where the disk goes ───────────────────
                 const dropX = dragPos.current.x;
                 const { index: nearest, distance } = findNearestTower(dropX);
 
@@ -147,7 +136,7 @@ export default function Disk3d({
                     canDropOnTower(towerId, nearest);
 
                 if (valid) {
-                    // Build a 3-step arc: lift → fly → drop
+                    // lift → fly → drop
                     const targetX = towerPositions[nearest][0];
                     const targetY = getDropTargetY(nearest);
                     const curPos = meshRef.current.position;
@@ -159,7 +148,6 @@ export default function Disk3d({
                     wpIndex.current = 0;
                     phase.current = "animating";
                     onAnimDone.current = () => {
-                        // Commit the move AFTER the full animation plays.
                         onDiskDrop(towerId, nearest);
                     };
                 } else {
@@ -175,7 +163,6 @@ export default function Disk3d({
 
             const onLostCapture = () => {
                 cleanup();
-                // Return disk to its resting position.
                 waypoints.current = [new THREE.Vector3(...targetPosition)];
                 wpIndex.current = 0;
                 phase.current = "animating";
@@ -189,13 +176,11 @@ export default function Disk3d({
 
             try { canvas.setPointerCapture(e.nativeEvent.pointerId); } catch { /* ok */ }
         },
-        // Dependencies – all values read inside the closures:
         [isTopDisk, isGameActive, towerId, towerPositions,
          canDropOnTower, onDiskDrop, getDropTargetY,
          targetPosition, screenToWorld, findNearestTower, gl],
     );
 
-    // ── per-frame animation loop ────────────────────────────────
     useFrame((_, delta) => {
         if (!meshRef.current) return;
         const pos = meshRef.current.position;
@@ -204,12 +189,10 @@ export default function Disk3d({
         const t = 1 - Math.exp(-LERP_SPEED * delta);
 
         switch (phase.current) {
-            // ── DRAGGING: hard-follow the cursor ─────────────────
             case "dragging":
                 pos.copy(dragPos.current);
                 break;
 
-            // ── ANIMATING: step through waypoints with lerp ──────
             case "animating": {
                 const wp = waypoints.current[wpIndex.current];
                 if (!wp) { phase.current = "idle"; break; }
@@ -233,7 +216,6 @@ export default function Disk3d({
                 break;
             }
 
-            // ── IDLE: gently converge on the rest position ───────
             case "idle":
             default:
                 pos.lerp(idleTarget.current, t);
@@ -241,7 +223,6 @@ export default function Disk3d({
         }
     });
 
-    // ── geometry ─────────────────────────────────────────────────
     const width = 2;
 
     const colors = [
@@ -270,7 +251,6 @@ export default function Disk3d({
         return new THREE.LatheGeometry(points, 64);
     }, [outerRadius, innerRadius, thickness]);
 
-    // ── render ───────────────────────────────────────────────────
     return (
         <mesh
             ref={meshRef}
