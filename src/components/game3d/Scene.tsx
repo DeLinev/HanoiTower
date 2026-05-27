@@ -1,8 +1,9 @@
-import { useMemo, useRef, useCallback } from "react";
+import { useMemo, useRef, useCallback, useEffect } from "react";
 import { useGameStateStore } from "../../stores/useGameStateStore";
 import type { HanoiGameProps } from "../../types/ui.types";
-import { Canvas } from "@react-three/fiber";
-import { Environment, useHelper } from "@react-three/drei";
+import { Canvas, useThree } from "@react-three/fiber";
+import { Environment, OrbitControls, useHelper } from "@react-three/drei";
+import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { getDisk3dThickness } from "../../constants/game.constants";
 import * as THREE from "three";
 import Tower3d from "./Tower3d";
@@ -28,7 +29,36 @@ function Light() {
     )
 }
 
+const INITIAL_CAM_POS = new THREE.Vector3(0, 5, 60);
+const INITIAL_CAM_TARGET = new THREE.Vector3(0, 5, 0);
+
+/**
+ * Listens for the Home or R key and smoothly resets the camera
+ * to its initial position / target.
+ */
+function CameraReset({ controlsRef }: { controlsRef: React.RefObject<OrbitControlsImpl | null> }) {
+    const { camera } = useThree();
+
+    useEffect(() => {
+        const onKey = (e: KeyboardEvent) => {
+            if (e.key === "Home" || (e.key === "r" && !e.ctrlKey && !e.metaKey)) {
+                const controls = controlsRef.current;
+                if (!controls) return;
+
+                camera.position.copy(INITIAL_CAM_POS);
+                controls.target.copy(INITIAL_CAM_TARGET);
+                controls.update();
+            }
+        };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [camera, controlsRef]);
+
+    return null;
+}
+
 export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive }: HanoiGameProps) {
+    const controlsRef = useRef<OrbitControlsImpl>(null);
     const gameState = useGameStateStore(state => state.gameState);
     const towerSpacing = 18;
     const centerIndex = (gameState.towers.length - 1) / 2;
@@ -93,10 +123,47 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                 antialias: true
             }}
         >
-            {/* <OrbitControls target={[0, 5, 0]} /> */}
+            <CameraReset controlsRef={controlsRef} />
+            <OrbitControls
+                ref={controlsRef}
+                target={[0, 5, 0]}
+                /* ── mouse button mapping ─────────────────────────
+                 * THREE.MOUSE values:  LEFT = 0, MIDDLE = 1, RIGHT = 2
+                 *
+                 * By setting mouseButtons.LEFT to null we free the LMB
+                 * entirely so disk dragging never fights with the camera.
+                 * Orbit (rotate) is moved to MMB, pan stays on RMB.
+                 */
+                mouseButtons={{
+                    LEFT:   undefined as unknown as THREE.MOUSE,   // disabled
+                    MIDDLE: THREE.MOUSE.ROTATE,
+                    RIGHT:  THREE.MOUSE.PAN,
+                }}
+                /* ── keyboard controls ────────────────────────────
+                 * Attaching to `window` lets arrow / WASD keys work
+                 * regardless of which element has focus.
+                 * drei's OrbitControls forwards this to the underlying
+                 * three/examples OrbitControls.listenToKeyEvents().
+                 */
+                keyEvents={document.documentElement}
+                /* ── zoom ─────────────────────────────────────────
+                 * Scroll-to-zoom is on by default; keep it enabled
+                 * and clamp the range to prevent zooming too far.
+                 */
+                enableZoom={true}
+                minDistance={20}
+                maxDistance={120}
+                /* ── damping for a polished feel ──────────────────*/
+                enableDamping={true}
+                dampingFactor={0.12}
+                /* ── vertical orbit limits ────────────────────────
+                 * Prevent the camera from flipping under the ground.
+                 */
+                maxPolarAngle={Math.PI / 2}
+            />
             <axesHelper args={[5]} />
             {/* <gridHelper args={[10, 10]} /> */}
-            {/* <ambientLight intensity={0.5} /> */}
+            <ambientLight intensity={0.5} />
             <Light />
             <Environment preset="sunset" />
             <mesh position={[0, 0, 0]} receiveShadow>

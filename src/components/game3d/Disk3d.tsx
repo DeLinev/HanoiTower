@@ -98,6 +98,7 @@ export default function Disk3d({
     const handlePointerDown = useCallback(
         (e: ThreeEvent<PointerEvent>) => {
             if (!isTopDisk || !isGameActive || phase.current !== "idle") return;
+            if (e.nativeEvent.button !== 0) return;
             e.stopPropagation();
 
             phase.current = "dragging";
