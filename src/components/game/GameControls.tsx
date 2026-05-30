@@ -43,7 +43,7 @@ export function GameControls({ timePassed, timeRemaining, isTimerRunning, onRese
                             </Button>
                         }
                         <Button variant="secondary" size="small" onClick={() => navigate("/")}>
-                            Quite
+                            Quit
                         </Button>
                     </div>
                 </div>

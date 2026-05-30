@@ -5,37 +5,78 @@ import { Canvas, useThree } from "@react-three/fiber";
 import { Environment, OrbitControls, useHelper } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { getDisk3dThickness } from "../../constants/game.constants";
+import { QUALITY } from "../../constants/quality.constants";
 import * as THREE from "three";
 import Tower3d from "./Tower3d";
 import Disk3d from "./Disk3d";
 
-function Light() {
-    const lightRef = useRef<THREE.SpotLight>(null!)
+function Lights() {
+    const spotLightRef = useRef<THREE.SpotLight>(null!);
+    useHelper(
+        import.meta.env.DEV ? spotLightRef : null, 
+        THREE.SpotLightHelper, 
+        "#fff5e6"
+    );
+    
+    const directionalLightRef = useRef<THREE.DirectionalLight>(null!);
+    useHelper(
+        import.meta.env.DEV ? directionalLightRef : null, 
+        THREE.DirectionalLightHelper, 
+        1
+    );
 
-    useHelper(lightRef, THREE.SpotLightHelper, 1)
+    const pointLightRef = useRef<THREE.PointLight>(null!);
+    useHelper(
+        import.meta.env.DEV ? pointLightRef : null, 
+        THREE.PointLightHelper, 
+        1
+    );
 
     return (
-        <spotLight
-            ref={lightRef}
-            position={[-60, 20, 10]}
-            angle={0.2}
-            penumbra={1}
-            decay={0}
-            intensity={Math.PI}
-            castShadow
-            shadow-mapSize-width={4096}
-            shadow-mapSize-height={4096}
-        />
-    )
+        <group>
+            <spotLight
+                // ref={spotLightRef}
+                position={[-30, 25, 20]}
+                angle={0.3}
+                penumbra={0.8}
+                decay={0}
+                intensity={Math.PI * 0.9}
+                color="#fff5e6"
+                castShadow
+                shadow-mapSize-width={QUALITY.shadowMapSize}
+                shadow-mapSize-height={QUALITY.shadowMapSize}
+                shadow-bias={-0.0001}
+                shadow-normalBias={0.02}
+                shadow-camera-near={1}
+                shadow-camera-far={80}
+                shadow-camera-left={-40}
+                shadow-camera-right={40}
+                shadow-camera-top={30}
+                shadow-camera-bottom={-10}
+            />
+
+            <directionalLight
+                // ref={directionalLightRef}
+                position={[25, 10, -15]}
+                intensity={0.6}
+                color="#cce0ff"
+            />
+
+            <pointLight
+                // ref={pointLightRef}
+                position={[0, 18, -20]}
+                intensity={0.8}
+                color="#ffffff"
+            />
+
+            <ambientLight intensity={0.35} />
+        </group>
+    );
 }
 
 const INITIAL_CAM_POS = new THREE.Vector3(0, 5, 60);
 const INITIAL_CAM_TARGET = new THREE.Vector3(0, 5, 0);
 
-/**
- * Listens for the Home or R key and smoothly resets the camera
- * to its initial position / target.
- */
 function CameraReset({ controlsRef }: { controlsRef: React.RefObject<OrbitControlsImpl | null> }) {
     const { camera } = useThree();
 
@@ -63,7 +104,6 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
     const towerSpacing = 18;
     const centerIndex = (gameState.towers.length - 1) / 2;
 
-    // X / Y / Z base position for each tower rod.
     const towerPositions = useMemo(() => {
         return Array.from({ length: gameState.towers.length }, (_, index) =>
             [(index - centerIndex) * towerSpacing, 5, 0] as [number, number, number]
@@ -71,7 +111,7 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
     }, [gameState.towers.length, centerIndex, towerSpacing]);
 
     const allDiskData = useMemo(() => {
-        const DISK_BASE_Y = 0.26; // just above the ground box
+        const DISK_BASE_Y = 0.26;
 
         return gameState.towers.flatMap((tower) => {
             const towerPos = towerPositions[tower.id];
@@ -91,12 +131,6 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
         });
     }, [gameState.towers, towerPositions]);
 
-    /**
-     * Given a tower id, return the Y coordinate where the next
-     * disk would rest if dropped on top of that tower's current stack.
-     * This is called by Disk3d to build its drop‑animation waypoints
-     * *before* the game state is updated.
-     */
     const getDropTargetY = useCallback(
         (targetTowerId: number) => {
             const DISK_BASE_Y = 0.26;
@@ -120,52 +154,34 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                 far: 1000,
             }}
             gl={{
-                antialias: true
+                antialias: true,
+                toneMapping: THREE.ACESFilmicToneMapping,
+                toneMappingExposure: 1.1,
             }}
         >
             <CameraReset controlsRef={controlsRef} />
             <OrbitControls
                 ref={controlsRef}
                 target={[0, 5, 0]}
-                /* ── mouse button mapping ─────────────────────────
-                 * THREE.MOUSE values:  LEFT = 0, MIDDLE = 1, RIGHT = 2
-                 *
-                 * By setting mouseButtons.LEFT to null we free the LMB
-                 * entirely so disk dragging never fights with the camera.
-                 * Orbit (rotate) is moved to MMB, pan stays on RMB.
-                 */
                 mouseButtons={{
-                    LEFT:   undefined as unknown as THREE.MOUSE,   // disabled
+                    LEFT:   undefined as unknown as THREE.MOUSE,
                     MIDDLE: THREE.MOUSE.ROTATE,
                     RIGHT:  THREE.MOUSE.PAN,
                 }}
-                /* ── keyboard controls ────────────────────────────
-                 * Attaching to `window` lets arrow / WASD keys work
-                 * regardless of which element has focus.
-                 * drei's OrbitControls forwards this to the underlying
-                 * three/examples OrbitControls.listenToKeyEvents().
-                 */
                 keyEvents={document.documentElement}
-                /* ── zoom ─────────────────────────────────────────
-                 * Scroll-to-zoom is on by default; keep it enabled
-                 * and clamp the range to prevent zooming too far.
-                 */
                 enableZoom={true}
                 minDistance={20}
                 maxDistance={120}
-                /* ── damping for a polished feel ──────────────────*/
                 enableDamping={true}
                 dampingFactor={0.12}
-                /* ── vertical orbit limits ────────────────────────
-                 * Prevent the camera from flipping under the ground.
-                 */
                 maxPolarAngle={Math.PI / 2}
             />
-            <axesHelper args={[5]} />
-            {/* <gridHelper args={[10, 10]} /> */}
-            <ambientLight intensity={0.5} />
-            <Light />
-            <Environment preset="sunset" />
+            {import.meta.env.DEV && <axesHelper args={[15]} />}
+
+            <Lights />
+
+            <Environment preset="apartment" background={false} />
+
             <mesh position={[0, 0, 0]} receiveShadow>
                 <boxGeometry args={[60, 0.5, 20]} />
                 <meshStandardMaterial color="#a37858" />
@@ -196,5 +212,5 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                 />
             ))}
         </Canvas>
-    )
+    );
 }

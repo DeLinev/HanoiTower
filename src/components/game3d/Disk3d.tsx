@@ -2,6 +2,7 @@ import { useMemo, useRef, useEffect, useCallback } from "react";
 import type { Disk3dComponentProps } from "../../types/ui.types";
 import * as THREE from "three";
 import { getDisk3dThickness } from "../../constants/game.constants";
+import { QUALITY } from "../../constants/quality.constants";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 
@@ -248,8 +249,8 @@ export default function Disk3d({
         path.quadraticCurveTo(outerRadius, thickness, outerRadius - edge, thickness);
         path.lineTo(innerRadius, thickness);
 
-        const points = path.getPoints(64);
-        return new THREE.LatheGeometry(points, 64);
+        const points = path.getPoints(QUALITY.diskProfileSamples);
+        return new THREE.LatheGeometry(points, QUALITY.diskRadialSegments);
     }, [outerRadius, innerRadius, thickness]);
 
     return (
@@ -269,6 +270,7 @@ export default function Disk3d({
             }}
             geometry={geometry}
             castShadow
+            receiveShadow
         >
             <meshStandardMaterial color={color} side={THREE.DoubleSide} />
         </mesh>
