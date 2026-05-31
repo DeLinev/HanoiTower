@@ -6,6 +6,9 @@ export default function Tower3d({ position, onClick, isSelected }: Tower3dProps)
     const towerWidth = 1;
     const towerHeight = 10;
     const [x, y, z] = position;
+    const rodColor = isSelected ? "#c0c8d0" : "#8a9199";
+    const rodMetalness = 0.85;
+    const rodRoughness = isSelected ? 0.18 : 0.28;
 
     return (
         <group>
@@ -14,7 +17,13 @@ export default function Tower3d({ position, onClick, isSelected }: Tower3dProps)
                     towerWidth, towerWidth, towerHeight,
                     QUALITY.towerRadialSegments,
                 ]} />
-                <meshStandardMaterial color={isSelected ? "#b0b0b0" : "grey"} side={THREE.DoubleSide} />
+                <meshStandardMaterial
+                    color={rodColor}
+                    metalness={rodMetalness}
+                    roughness={rodRoughness}
+                    envMapIntensity={1.0}
+                    side={THREE.DoubleSide}
+                />
             </mesh>
 
             <mesh position={[x, y + towerHeight / 2, z]} castShadow receiveShadow>
@@ -23,7 +32,13 @@ export default function Tower3d({ position, onClick, isSelected }: Tower3dProps)
                     QUALITY.towerCapSegments[0],
                     QUALITY.towerCapSegments[1],
                 ]} />
-                <meshStandardMaterial color={isSelected ? "#b0b0b0" : "grey"} side={THREE.DoubleSide} />
+                <meshStandardMaterial
+                    color={rodColor}
+                    metalness={rodMetalness}
+                    roughness={rodRoughness}
+                    envMapIntensity={1.0}
+                    side={THREE.DoubleSide}
+                />
             </mesh>
         </group>
     );

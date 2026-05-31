@@ -225,14 +225,20 @@ export default function Disk3d({
         }
     });
 
-    const width = 2;
-
-    const colors = [
-        "#ff0000", "#ff9800", "#ffff00", "#4caf50",
-        "#2196f3", "#3f51b5", "#9c27b0", "#e91e63",
+    const DISK_COLORS = [
+        "#d94040",   // 1 – warm red
+        "#e08530",   // 2 – amber
+        "#c9b835",   // 3 – gold
+        "#45a86f",   // 4 – emerald
+        "#3a8fd6",   // 5 – sky blue
+        "#5b5fc7",   // 6 – indigo
+        "#9346b0",   // 7 – violet
+        "#d44882",   // 8 – rose
     ];
-    const color = colors[disk.size - 1] || colors[0];
+    const color = DISK_COLORS[disk.size - 1] || DISK_COLORS[0];
 
+
+    const width = 2;
     const calculatedWidth = width + disk.size * 0.5;
     const outerRadius = calculatedWidth < 2 ? 2 : calculatedWidth;
     const innerRadius = 1;
@@ -272,7 +278,15 @@ export default function Disk3d({
             castShadow
             receiveShadow
         >
-            <meshStandardMaterial color={color} side={THREE.DoubleSide} />
+            <meshPhysicalMaterial
+                color={color}
+                roughness={0.35}
+                metalness={0.0}
+                clearcoat={0.6}
+                clearcoatRoughness={0.15}
+                envMapIntensity={0.8}
+                side={THREE.DoubleSide}
+            />
         </mesh>
     );
 }

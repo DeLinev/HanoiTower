@@ -184,7 +184,12 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
 
             <mesh position={[0, 0, 0]} receiveShadow>
                 <boxGeometry args={[60, 0.5, 20]} />
-                <meshStandardMaterial color="#a37858" />
+                <meshStandardMaterial
+                    color="#6b4226"
+                    roughness={0.75}
+                    metalness={0.0}
+                    envMapIntensity={0.3}
+                />
             </mesh>
 
             {gameState.towers.map((tower) => (
