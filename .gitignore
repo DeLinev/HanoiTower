@@ -26,4 +26,6 @@ dist-ssr
 *storybook.log
 storybook-static
 
-public/
+# Public directory — track texture assets, ignore the rest
+public/*
+!public/textures/

@@ -1,41 +1,20 @@
-import { useMemo, useRef, useCallback, useEffect } from "react";
+import { Suspense, useMemo, useRef, useCallback, useEffect } from "react";
 import { useGameStateStore } from "../../stores/useGameStateStore";
 import type { HanoiGameProps } from "../../types/ui.types";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Environment, OrbitControls, useHelper } from "@react-three/drei";
+import { Environment, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { getDisk3dThickness } from "../../constants/game.constants";
 import { QUALITY } from "../../constants/quality.constants";
 import * as THREE from "three";
 import Tower3d from "./Tower3d";
 import Disk3d from "./Disk3d";
+import Base3d from "./Base3d";
 
 function Lights() {
-    const spotLightRef = useRef<THREE.SpotLight>(null!);
-    useHelper(
-        import.meta.env.DEV ? spotLightRef : null, 
-        THREE.SpotLightHelper, 
-        "#fff5e6"
-    );
-    
-    const directionalLightRef = useRef<THREE.DirectionalLight>(null!);
-    useHelper(
-        import.meta.env.DEV ? directionalLightRef : null, 
-        THREE.DirectionalLightHelper, 
-        1
-    );
-
-    const pointLightRef = useRef<THREE.PointLight>(null!);
-    useHelper(
-        import.meta.env.DEV ? pointLightRef : null, 
-        THREE.PointLightHelper, 
-        1
-    );
-
     return (
         <group>
             <spotLight
-                // ref={spotLightRef}
                 position={[-30, 25, 20]}
                 angle={0.3}
                 penumbra={0.8}
@@ -56,14 +35,12 @@ function Lights() {
             />
 
             <directionalLight
-                // ref={directionalLightRef}
                 position={[25, 10, -15]}
                 intensity={0.6}
                 color="#cce0ff"
             />
 
             <pointLight
-                // ref={pointLightRef}
                 position={[0, 18, -20]}
                 intensity={0.8}
                 color="#ffffff"
@@ -176,46 +153,41 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                 dampingFactor={0.12}
                 maxPolarAngle={Math.PI / 2}
             />
+
             {import.meta.env.DEV && <axesHelper args={[15]} />}
 
             <Lights />
 
             <Environment preset="apartment" background={false} />
 
-            <mesh position={[0, 0, 0]} receiveShadow>
-                <boxGeometry args={[60, 0.5, 20]} />
-                <meshStandardMaterial
-                    color="#6b4226"
-                    roughness={0.75}
-                    metalness={0.0}
-                    envMapIntensity={0.3}
-                />
-            </mesh>
+            <Suspense fallback={null}>
+                <Base3d />
 
-            {gameState.towers.map((tower) => (
-                <Tower3d
-                    key={tower.id}
-                    tower={tower}
-                    position={towerPositions[tower.id]}
-                    onClick={() => onTowerSelect(tower.id)}
-                    isSelected={gameState.selectedTower === tower.id}
-                />
-            ))}
+                {gameState.towers.map((tower) => (
+                    <Tower3d
+                        key={tower.id}
+                        tower={tower}
+                        position={towerPositions[tower.id]}
+                        onClick={() => onTowerSelect(tower.id)}
+                        isSelected={gameState.selectedTower === tower.id}
+                    />
+                ))}
 
-            {allDiskData.map(({ disk, towerId, isTopDisk, targetPosition }) => (
-                <Disk3d
-                    key={disk.id}
-                    disk={disk}
-                    towerId={towerId}
-                    isTopDisk={isTopDisk}
-                    isGameActive={isGameActive}
-                    targetPosition={targetPosition}
-                    towerPositions={towerPositions}
-                    onDiskDrop={onDiskDrop}
-                    canDropOnTower={canDropOnTower}
-                    getDropTargetY={getDropTargetY}
-                />
-            ))}
+                {allDiskData.map(({ disk, towerId, isTopDisk, targetPosition }) => (
+                    <Disk3d
+                        key={disk.id}
+                        disk={disk}
+                        towerId={towerId}
+                        isTopDisk={isTopDisk}
+                        isGameActive={isGameActive}
+                        targetPosition={targetPosition}
+                        towerPositions={towerPositions}
+                        onDiskDrop={onDiskDrop}
+                        canDropOnTower={canDropOnTower}
+                        getDropTargetY={getDropTargetY}
+                    />
+                ))}
+            </Suspense>
         </Canvas>
     );
 }

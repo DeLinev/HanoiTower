@@ -5,6 +5,7 @@ import { getDisk3dThickness } from "../../constants/game.constants";
 import { QUALITY } from "../../constants/quality.constants";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
+import { usePlasticTextures } from "../../hooks/useSceneTextures";
 
 /** Invisible plane at z = 0 used to project the pointer into world space. */
 const dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
@@ -236,8 +237,6 @@ export default function Disk3d({
         "#d44882",   // 8 – rose
     ];
     const color = DISK_COLORS[disk.size - 1] || DISK_COLORS[0];
-
-
     const width = 2;
     const calculatedWidth = width + disk.size * 0.5;
     const outerRadius = calculatedWidth < 2 ? 2 : calculatedWidth;
@@ -259,6 +258,8 @@ export default function Disk3d({
         return new THREE.LatheGeometry(points, QUALITY.diskRadialSegments);
     }, [outerRadius, innerRadius, thickness]);
 
+    const textures = usePlasticTextures();
+
     return (
         <mesh
             ref={meshRef}
@@ -279,6 +280,7 @@ export default function Disk3d({
             receiveShadow
         >
             <meshPhysicalMaterial
+                {...textures}
                 color={color}
                 roughness={0.35}
                 metalness={0.0}
