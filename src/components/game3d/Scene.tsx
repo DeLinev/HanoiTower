@@ -10,6 +10,7 @@ import * as THREE from "three";
 import Tower3d from "./Tower3d";
 import Disk3d from "./Disk3d";
 import Base3d from "./Base3d";
+import { KeyboardControls } from "./KeyboardControls";
 
 function Lights() {
     return (
@@ -137,6 +138,7 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
             }}
         >
             <CameraReset controlsRef={controlsRef} />
+            <KeyboardControls controlsRef={controlsRef} />
             <OrbitControls
                 ref={controlsRef}
                 target={[0, 5, 0]}
@@ -145,7 +147,6 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                     MIDDLE: THREE.MOUSE.ROTATE,
                     RIGHT:  THREE.MOUSE.PAN,
                 }}
-                keyEvents={document.documentElement}
                 enableZoom={true}
                 minDistance={20}
                 maxDistance={120}

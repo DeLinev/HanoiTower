@@ -4,6 +4,7 @@ import Logo from "../../assets/logo.svg"
 import { QuestionMarkCircleIcon, AdjustmentsVerticalIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { showPreferences } from "vanilla-cookieconsent";
+import { ControlsHint } from "./ControlsHint";
 
 export function Layout({ children }: { children: ReactNode }) {
     const [showTooltip, setShowTooltip] = useState(false);
@@ -23,7 +24,7 @@ export function Layout({ children }: { children: ReactNode }) {
                             onMouseLeave={() => setShowTooltip(false)}
                         />
                         {showTooltip && (
-                            <div className="absolute right-20 top-0 w-80 p-4 bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
+                            <div className="absolute right-0 top-12 w-80 p-4 bg-gray-800 border border-gray-600 rounded-lg shadow-lg">
                                 <h3 className="text-lg font-semibold text-gray-200 mb-2">Tower of Hanoi Rules</h3>
                                 <div className="text-sm text-gray-300 space-y-2">
                                     <p><strong>Objective:</strong> Move all disks from the first rod to the third rod.</p>
@@ -37,10 +38,16 @@ export function Layout({ children }: { children: ReactNode }) {
                                 </div>
                             </div>
                         )}
-                        <AdjustmentsVerticalIcon
-                            className="text-gray-300 hover:text-gray-400 w-8 h-8"
+                        <ControlsHint />
+                        <button
                             onClick={() => showPreferences()}
-                        />
+                            title="Preferences"
+                            aria-label="Show preferences"
+                        >
+                            <AdjustmentsVerticalIcon
+                                className="text-gray-300 hover:text-gray-400 w-8 h-8 cursor-pointer"
+                            />
+                        </button>
                     </div>
                 </header>
 

@@ -40,10 +40,19 @@ export default function ScoreboardPage() {
                             </thead>
                             <tbody className="bg-gray-800">
                                 {scoreboard.map((player, index) => (
-                                    <tr 
+                                    <tr
                                         key={player.nickname}
-                                        className="border-b border-gray-700 hover:bg-gray-700 transition-colors duration-150 cursor-pointer"
+                                        className="border-b border-gray-700 hover:bg-gray-700 
+                                                   transition-colors duration-150 cursor-pointer"
                                         onClick={() => handleNicknameClick(player.nickname)}
+                                        tabIndex={0}
+                                        role="button"
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter' || e.key === ' ') {
+                                                e.preventDefault();
+                                                handleNicknameClick(player.nickname);
+                                            }
+                                        }}
                                     >
                                         <td className="px-6 py-4 font-medium">
                                             #{index + 1}

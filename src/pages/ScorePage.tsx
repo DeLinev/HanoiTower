@@ -1,13 +1,15 @@
-import { Navigate, useParams } from "react-router-dom";
+import { Navigate, useNavigate, useParams } from "react-router-dom";
 import type { GameStatistic } from "../types/game.types";
 import { Layout } from "../components/layout/Layout";
 import { StatCard } from "../components/common/StatCard";
 import StatRow from "../components/common/StatRow";
 import { useScoreboardStore } from "../stores/useScoreboardStore";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
 export default function ScorePage() {
     const { scoreboard } = useScoreboardStore();
     const { nickname } = useParams();
+    const navigate = useNavigate();
 
     const userScore = scoreboard.find(entry => entry.nickname === nickname);
     if (!userScore) {
@@ -24,7 +26,14 @@ export default function ScorePage() {
     return (
         <Layout>
             <div className="max-w-6xl mx-auto p-6">
-                <div className="mb-8">
+                <div className="mb-8 relative">
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="flex items-center text-gray-400 hover:text-gray-300 absolute top-1/2 -translate-y-1/2 text-lg"
+                        >
+                        <ArrowLeftIcon className="w-7 h-7 mr-1" />
+                        Back
+                    </button>
                     <h1 className="text-4xl font-bold text-center mb-2">
                         {nickname}'s Statistics
                     </h1>

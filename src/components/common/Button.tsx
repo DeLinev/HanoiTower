@@ -37,7 +37,7 @@ export function Button ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles}`}
+      className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyles} cursor-pointer`}
     >
       {children}
     </button>
