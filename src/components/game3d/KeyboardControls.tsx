@@ -58,20 +58,20 @@ export function KeyboardControls({
         const zoomDelta = ZOOM_SPEED * delta;
 
         const hasOrbit =
-            k.has("a") || k.has("arrowleft") ||
-            k.has("d") || k.has("arrowright") ||
-            k.has("w") || k.has("arrowup") ||
-            k.has("s") || k.has("arrowdown");
+            k.has("a") ||
+            k.has("d") ||
+            k.has("w") ||
+            k.has("s");
 
         if (hasOrbit) {
             _offset.copy(camera.position).sub(controls.target);
             _spherical.setFromVector3(_offset);
 
-            if (k.has("a") || k.has("arrowleft"))  _spherical.theta += orbitDelta;
-            if (k.has("d") || k.has("arrowright")) _spherical.theta -= orbitDelta;
+            if (k.has("a"))  _spherical.theta += orbitDelta;
+            if (k.has("d")) _spherical.theta -= orbitDelta;
 
-            if (k.has("w") || k.has("arrowup"))    _spherical.phi -= orbitDelta;
-            if (k.has("s") || k.has("arrowdown"))  _spherical.phi += orbitDelta;
+            if (k.has("w"))    _spherical.phi -= orbitDelta;
+            if (k.has("s"))  _spherical.phi += orbitDelta;
 
             // Clamp polar angle to OrbitControls' constraints.
             const EPS = 0.001;

@@ -6,7 +6,7 @@ export function ControlsHint() {
 
     return (
         <>
-            <ComputerDesktopIcon 
+            <ComputerDesktopIcon
                 onMouseEnter={() => setIsOpen(true)}
                 onMouseLeave={() => setIsOpen(false)}
                 className="text-gray-300 hover:text-gray-100 transition-colors w-8 h-8"
@@ -16,16 +16,22 @@ export function ControlsHint() {
 
             {isOpen && (
                 <div className="absolute right-0 top-12 w-96 p-5 bg-gray-800/95 backdrop-blur-sm border border-gray-600 rounded-lg shadow-2xl z-50">
-                    <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-lg font-semibold text-gray-100">Controls</h3>
-                    </div>
+                    <h3 className="text-lg font-semibold text-gray-100 mb-4">Controls</h3>
 
-                    <Section title="🎮 Game">
-                        <Row keys="Left click + drag" action="Move a disk" />
+                    <Section title="🎮 Game — Mouse">
+                        <Row keys="Left click + drag" action="Drag a disk" />
+                        <Row keys="Left click tower" action="Select / place disk" />
+                    </Section>
+
+                    <Section title="⌨️ Game — Keyboard">
+                        <Row keys="Tab / ← →" action="Cycle tower focus" />
+                        <Row keys="Enter / Space" action="Pick up / drop disk" />
+                        <Row keys="1  2  3" action="Jump to tower + select" />
+                        <Row keys="Escape" action="Cancel move" />
                     </Section>
 
                     <Section title="📷 Camera">
-                        <Row keys="W A S D / Arrow keys" action="Orbit (rotate)" />
+                        <Row keys="W A S D" action="Orbit (rotate)" />
                         <Row keys="Q / E" action="Pan left / right" />
                         <Row keys="Z / X" action="Pan up / down" />
                         <Row keys="+ / −" action="Zoom in / out" />

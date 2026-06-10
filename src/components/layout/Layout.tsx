@@ -4,7 +4,7 @@ import Logo from "../../assets/logo.svg"
 import { QuestionMarkCircleIcon, AdjustmentsVerticalIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
 import { showPreferences } from "vanilla-cookieconsent";
-import { ControlsHint } from "./ControlsHint";
+import { ControlsHint } from "../common/ControlsHint";
 
 export function Layout({ children }: { children: ReactNode }) {
     const [showTooltip, setShowTooltip] = useState(false);

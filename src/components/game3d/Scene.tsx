@@ -1,8 +1,8 @@
-import { Suspense, useMemo, useRef, useCallback, useEffect } from "react";
+import { Suspense, useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { useGameStateStore } from "../../stores/useGameStateStore";
 import type { HanoiGameProps } from "../../types/ui.types";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
+import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
 import type { OrbitControls as OrbitControlsImpl } from "three-stdlib";
 import { getDisk3dThickness } from "../../constants/game.constants";
 import { QUALITY } from "../../constants/quality.constants";
@@ -11,6 +11,7 @@ import Tower3d from "./Tower3d";
 import Disk3d from "./Disk3d";
 import Base3d from "./Base3d";
 import { KeyboardControls } from "./KeyboardControls";
+import { GameKeyboardControls } from "./GameKeyboardControls";
 
 function Lights() {
     return (
@@ -34,19 +35,8 @@ function Lights() {
                 shadow-camera-top={30}
                 shadow-camera-bottom={-10}
             />
-
-            <directionalLight
-                position={[25, 10, -15]}
-                intensity={0.6}
-                color="#cce0ff"
-            />
-
-            <pointLight
-                position={[0, 18, -20]}
-                intensity={0.8}
-                color="#ffffff"
-            />
-
+            <directionalLight position={[25, 10, -15]} intensity={0.6} color="#cce0ff" />
+            <pointLight position={[0, 18, -20]} intensity={0.8} color="#ffffff" />
             <ambientLight intensity={0.35} />
         </group>
     );
@@ -63,7 +53,6 @@ function CameraReset({ controlsRef }: { controlsRef: React.RefObject<OrbitContro
             if (e.key === "Home" || (e.key === "r" && !e.ctrlKey && !e.metaKey)) {
                 const controls = controlsRef.current;
                 if (!controls) return;
-
                 camera.position.copy(INITIAL_CAM_POS);
                 controls.target.copy(INITIAL_CAM_TARGET);
                 controls.update();
@@ -78,27 +67,44 @@ function CameraReset({ controlsRef }: { controlsRef: React.RefObject<OrbitContro
 
 export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive }: HanoiGameProps) {
     const controlsRef = useRef<OrbitControlsImpl>(null);
-    const gameState = useGameStateStore(state => state.gameState);
+    const gameState = useGameStateStore(s => s.gameState);
+
+    const [focusedTower, setFocusedTower] = useState(0);
+    const [isKeyboardMode, setIsKeyboardMode] = useState(false);
+
+    useEffect(() => {
+        const activateKeyboard = (e: KeyboardEvent) => {
+            const tag = (e.target as HTMLElement)?.tagName;
+            if (tag === "INPUT" || tag === "TEXTAREA") return;
+            setIsKeyboardMode(true);
+        };
+        const deactivateKeyboard = () => setIsKeyboardMode(false);
+
+        window.addEventListener("keydown", activateKeyboard);
+        window.addEventListener("mousedown", deactivateKeyboard);
+        return () => {
+            window.removeEventListener("keydown", activateKeyboard);
+            window.removeEventListener("mousedown", deactivateKeyboard);
+        };
+    }, []);
+
     const towerSpacing = 18;
     const centerIndex = (gameState.towers.length - 1) / 2;
 
     const towerPositions = useMemo(() => {
-        return Array.from({ length: gameState.towers.length }, (_, index) =>
-            [(index - centerIndex) * towerSpacing, 5, 0] as [number, number, number]
+        return Array.from({ length: gameState.towers.length }, (_, i) =>
+            [(i - centerIndex) * towerSpacing, 5, 0] as [number, number, number]
         );
     }, [gameState.towers.length, centerIndex, towerSpacing]);
 
     const allDiskData = useMemo(() => {
         const DISK_BASE_Y = 0.26;
-
         return gameState.towers.flatMap((tower) => {
             const towerPos = towerPositions[tower.id];
             let stackedHeight = 0;
-
             return tower.disks.map((disk, index) => {
                 const diskY = DISK_BASE_Y + stackedHeight;
                 stackedHeight += getDisk3dThickness(disk.size);
-
                 return {
                     disk,
                     towerId: tower.id,
@@ -114,13 +120,13 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
             const DISK_BASE_Y = 0.26;
             const tower = gameState.towers[targetTowerId];
             let y = DISK_BASE_Y;
-            for (const d of tower.disks) {
-                y += getDisk3dThickness(d.size);
-            }
+            for (const d of tower.disks) y += getDisk3dThickness(d.size);
             return y;
         },
         [gameState.towers],
     );
+
+    const handleKeyboardActivity = useCallback(() => setIsKeyboardMode(true), []);
 
     return (
         <Canvas
@@ -158,8 +164,28 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
             {import.meta.env.DEV && <axesHelper args={[15]} />}
 
             <Lights />
-
             <Environment preset="apartment" background={false} />
+
+            <ContactShadows
+                position={[0, 0.26, 0]}
+                opacity={0.35}
+                scale={60}
+                blur={2.5}
+                far={15}
+                resolution={512}
+            />
+
+            <GameKeyboardControls
+                onTowerSelect={onTowerSelect}
+                onDiskDrop={onDiskDrop}
+                canDropOnTower={canDropOnTower}
+                isGameActive={isGameActive}
+                towerPositions={towerPositions}
+                getDropTargetY={getDropTargetY}
+                focusedTower={focusedTower}
+                onFocusedTowerChange={setFocusedTower}
+                onKeyboardActivity={handleKeyboardActivity}
+            />
 
             <Suspense fallback={null}>
                 <Base3d />
@@ -171,6 +197,7 @@ export function Scene({ onTowerSelect, onDiskDrop, canDropOnTower, isGameActive 
                         position={towerPositions[tower.id]}
                         onClick={() => onTowerSelect(tower.id)}
                         isSelected={gameState.selectedTower === tower.id}
+                        isFocused={isKeyboardMode && focusedTower === tower.id}
                     />
                 ))}
 

@@ -71,7 +71,8 @@ export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: num
         if (!validation.canMoveDisk(fromTower, toTower)) return;
 
         executeMove(fromTowerId, toTowerId);
-    }, [isGameActive, gameState.towers, validation, executeMove]);
+        selection.deselectTower();
+    }, [isGameActive, gameState.towers, validation, executeMove, selection]);
 
     const handleTowerSelect = (towerId: number) => {
         if (!isGameActive) return;

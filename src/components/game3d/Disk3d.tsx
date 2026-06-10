@@ -7,21 +7,15 @@ import { useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import { usePlasticTextures } from "../../hooks/useSceneTextures";
 
-/** Invisible plane at z = 0 used to project the pointer into world space. */
 const dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
-/** Max X‑distance (world units) from a tower center for a drop to register. */
 const SNAP_THRESHOLD = 9;
-/** Y coordinate the disk lifts to during the fly‑over animation. */
 const LIFT_Y = 14;
-/**
- * Exponential‑lerp speed factor.  Higher = faster convergence.
- *   5 → ~95 % in 0.6 s     10 → ~95 % in 0.3 s     15 → ~95 % in 0.2 s
- */
+
+// Exponential-lerp speed: 20 → ~95% convergence in 0.15s
 const LERP_SPEED = 20;
-/** Distance below which we "snap" exactly to a waypoint target. */
 const WAYPOINT_SNAP = 0.12;
 
-type Phase = "idle" | "dragging" | "animating";
+type Phase = "idle" | "dragging" | "animating" | "hovering" | "shaking";
 
 export default function Disk3d({
     disk,
@@ -37,20 +31,18 @@ export default function Disk3d({
     const meshRef = useRef<THREE.Mesh>(null!);
     const phase = useRef<Phase>("idle");
 
-    /** Where the idle lerp is heading. */
     const idleTarget = useRef(new THREE.Vector3(...targetPosition));
-    /** Live cursor position while dragging. */
     const dragPos = useRef(new THREE.Vector3());
-    /** Ordered list of positions the disk must visit after a drop. */
     const waypoints = useRef<THREE.Vector3[]>([]);
     const wpIndex = useRef(0);
-    /** Callback fired after the last waypoint is reached. */
     const onAnimDone = useRef<(() => void) | null>(null);
 
-    /** Stored so we can clean up window listeners on unmount. */
+    const hoverTarget = useRef(new THREE.Vector3());
+    const shakeStart = useRef(0);
+
     const cleanupDrag = useRef<(() => void) | null>(null);
 
-    // Re-usable THREE objects – avoids GC churn in the hot path.
+    // Reusable THREE objects to avoid GC pressure in the render loop
     const raycaster = useRef(new THREE.Raycaster());
     const ndc = useRef(new THREE.Vector2());
     const planeHit = useRef(new THREE.Vector3());
@@ -58,9 +50,7 @@ export default function Disk3d({
     const { camera, gl } = useThree();
 
     useEffect(() => {
-        // Only overwrite the target when we're not mid-drag / mid-anim,
-        // so that a re-render during a spring animation can't teleport
-        // the disk.
+        // Only update idle target when we're at rest — prevents mid-animation teleporting
         if (phase.current === "idle") {
             idleTarget.current.set(...targetPosition);
         }
@@ -69,6 +59,61 @@ export default function Disk3d({
     useEffect(() => {
         return () => { cleanupDrag.current?.(); };
     }, []);
+
+    // GameKeyboardControls dispatches granular events per interaction step.
+    // Each Disk3d instance filters by its own disk.id.
+    useEffect(() => {
+        const isMe = (e: Event) => (e as CustomEvent).detail.diskId === disk.id;
+
+        const onLift = (e: Event) => {
+            if (!isMe(e) || phase.current !== "idle") return;
+            const { targetX, liftY } = (e as CustomEvent).detail;
+            hoverTarget.current.set(targetX, liftY, 0);
+            phase.current = "hovering";
+        };
+
+        const onFollow = (e: Event) => {
+            if (!isMe(e) || phase.current !== "hovering") return;
+            hoverTarget.current.x = (e as CustomEvent).detail.targetX;
+        };
+
+        const onDrop = (e: Event) => {
+            if (!isMe(e)) return;
+            const { fromTowerId, toTowerId, waypoints: wps } = (e as CustomEvent).detail;
+            waypoints.current = wps;
+            wpIndex.current = 0;
+            phase.current = "animating";
+            onAnimDone.current = () => onDiskDrop(fromTowerId, toTowerId);
+        };
+
+        const onCancel = (e: Event) => {
+            if (!isMe(e)) return;
+            if (phase.current !== "hovering" && phase.current !== "shaking") return;
+            waypoints.current = [idleTarget.current.clone()];
+            wpIndex.current = 0;
+            phase.current = "animating";
+            onAnimDone.current = null;
+        };
+
+        const onShake = (e: Event) => {
+            if (!isMe(e) || phase.current !== "hovering") return;
+            shakeStart.current = performance.now() / 1000;
+            phase.current = "shaking";
+        };
+
+        window.addEventListener("kb-disk-lift", onLift);
+        window.addEventListener("kb-disk-follow", onFollow);
+        window.addEventListener("kb-disk-drop", onDrop);
+        window.addEventListener("kb-disk-cancel", onCancel);
+        window.addEventListener("kb-disk-shake", onShake);
+        return () => {
+            window.removeEventListener("kb-disk-lift", onLift);
+            window.removeEventListener("kb-disk-follow", onFollow);
+            window.removeEventListener("kb-disk-drop", onDrop);
+            window.removeEventListener("kb-disk-cancel", onCancel);
+            window.removeEventListener("kb-disk-shake", onShake);
+        };
+    }, [disk.id, onDiskDrop]);
 
     const screenToWorld = useCallback(
         (sx: number, sy: number): THREE.Vector3 | null => {
@@ -105,7 +150,6 @@ export default function Disk3d({
 
             phase.current = "dragging";
 
-            // Lift the disk to the cursor immediately
             const w = screenToWorld(e.nativeEvent.clientX, e.nativeEvent.clientY);
             if (w) dragPos.current.copy(w);
 
@@ -139,25 +183,19 @@ export default function Disk3d({
                     canDropOnTower(towerId, nearest);
 
                 if (valid) {
-                    // lift → fly → drop
                     const targetX = towerPositions[nearest][0];
                     const targetY = getDropTargetY(nearest);
                     const curPos = meshRef.current.position;
                     waypoints.current = [
-                        new THREE.Vector3(curPos.x, LIFT_Y, 0),   // 1. lift
-                        new THREE.Vector3(targetX,  LIFT_Y, 0),   // 2. fly
-                        new THREE.Vector3(targetX,  targetY, 0),  // 3. drop
+                        new THREE.Vector3(curPos.x, LIFT_Y, 0),
+                        new THREE.Vector3(targetX,  LIFT_Y, 0),
+                        new THREE.Vector3(targetX,  targetY, 0),
                     ];
                     wpIndex.current = 0;
                     phase.current = "animating";
-                    onAnimDone.current = () => {
-                        onDiskDrop(towerId, nearest);
-                    };
+                    onAnimDone.current = () => onDiskDrop(towerId, nearest);
                 } else {
-                    // Invalid / same tower → glide back
-                    waypoints.current = [
-                        new THREE.Vector3(...targetPosition),
-                    ];
+                    waypoints.current = [new THREE.Vector3(...targetPosition)];
                     wpIndex.current = 0;
                     phase.current = "animating";
                     onAnimDone.current = null;
@@ -188,7 +226,7 @@ export default function Disk3d({
         if (!meshRef.current) return;
         const pos = meshRef.current.position;
 
-        // Frame-rate-independent exponential lerp factor.
+        // Frame-rate-independent exponential lerp
         const t = 1 - Math.exp(-LERP_SPEED * delta);
 
         switch (phase.current) {
@@ -203,19 +241,42 @@ export default function Disk3d({
                 pos.lerp(wp, t);
 
                 if (pos.distanceTo(wp) < WAYPOINT_SNAP) {
-                    pos.copy(wp);           // snap exactly
+                    pos.copy(wp);
                     wpIndex.current += 1;
 
                     if (wpIndex.current >= waypoints.current.length) {
                         phase.current = "idle";
-                        // Sync idle target to wherever the animation ended
-                        // (prevents a one‑frame drift before the useEffect
-                        //  fires with the new targetPosition from the store).
+                        // Sync idle target to final position so the idle lerp
+                        // doesn't drift for one frame before the useEffect
+                        // catches the new targetPosition from the store.
                         idleTarget.current.copy(pos);
                         onAnimDone.current?.();
                         onAnimDone.current = null;
                     }
                 }
+                break;
+            }
+
+            case "hovering":
+                pos.lerp(hoverTarget.current, t);
+                break;
+
+            case "shaking": {
+                const elapsed = performance.now() / 1000 - shakeStart.current;
+                const DURATION = 0.4;
+                const AMPLITUDE = 1.5;
+                const FREQ = 25;
+
+                if (elapsed > DURATION) {
+                    phase.current = "hovering";
+                    break;
+                }
+
+                // Decaying sine wave: rapid oscillation that fades to zero
+                const decay = 1 - elapsed / DURATION;
+                const offset = Math.sin(elapsed * FREQ) * AMPLITUDE * decay;
+                pos.lerp(hoverTarget.current, t);
+                pos.x += offset;
                 break;
             }
 
@@ -227,19 +288,12 @@ export default function Disk3d({
     });
 
     const DISK_COLORS = [
-        "#d94040",   // 1 – warm red
-        "#e08530",   // 2 – amber
-        "#c9b835",   // 3 – gold
-        "#45a86f",   // 4 – emerald
-        "#3a8fd6",   // 5 – sky blue
-        "#5b5fc7",   // 6 – indigo
-        "#9346b0",   // 7 – violet
-        "#d44882",   // 8 – rose
+        "#d94040", "#e08530", "#c9b835", "#45a86f",
+        "#3a8fd6", "#5b5fc7", "#9346b0", "#d44882",
     ];
     const color = DISK_COLORS[disk.size - 1] || DISK_COLORS[0];
-    const width = 2;
-    const calculatedWidth = width + disk.size * 0.5;
-    const outerRadius = calculatedWidth < 2 ? 2 : calculatedWidth;
+    const calculatedWidth = 2 + disk.size * 0.5;
+    const outerRadius = Math.max(2, calculatedWidth);
     const innerRadius = 1;
     const thickness = getDisk3dThickness(disk.size);
 

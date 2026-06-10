@@ -3,7 +3,11 @@ import { QUALITY } from "../../constants/quality.constants";
 import * as THREE from "three";
 import { useMetalTextures } from "../../hooks/useSceneTextures";
 
-export default function Tower3d({ position, onClick, isSelected }: Tower3dProps) {
+type ExtendedTower3dProps = Tower3dProps & {
+    isFocused: boolean;
+};
+
+export default function Tower3d({ position, onClick, isSelected, isFocused }: ExtendedTower3dProps) {
     const towerWidth = 1;
     const towerHeight = 10;
     const [x, y, z] = position;
@@ -46,6 +50,23 @@ export default function Tower3d({ position, onClick, isSelected }: Tower3dProps)
                     side={THREE.DoubleSide}
                 />
             </mesh>
+
+            {isFocused && (
+                <mesh
+                    position={[x, 0.27, z]}
+                    rotation={[-Math.PI / 2, 0, 0]}
+                >
+                    <ringGeometry args={[5, 5.5, 48]} />
+                    <meshStandardMaterial
+                        color="#fbbf24"
+                        emissive="#fbbf24"
+                        emissiveIntensity={0.6}
+                        transparent
+                        opacity={0.7}
+                        side={THREE.DoubleSide}
+                    />
+                </mesh>
+            )}
         </group>
     );
 }
