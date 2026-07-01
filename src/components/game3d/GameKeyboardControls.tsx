@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import * as THREE from "three";
 import { useGameStateStore } from "../../stores/useGameStateStore";
+import { playSound } from "../../stores/useAudioStore";
 
 const LIFT_Y = 14;
 
@@ -86,6 +87,7 @@ export function GameKeyboardControls({
             liftY: LIFT_Y,
         });
 
+        playSound("diskPickUp");
         onSelectRef.current(towerId);
     }, [emit]);
 
@@ -95,6 +97,7 @@ export function GameKeyboardControls({
             diskId: hoveringDiskId.current,
             targetX: posRef.current[towerId][0],
         });
+        playSound("diskPickUp");
     }, [emit]);
 
     const dropDisk = useCallback((toTowerId: number) => {
@@ -114,6 +117,8 @@ export function GameKeyboardControls({
                 new THREE.Vector3(toX, dropY, 0),
             ],
         });
+
+        playSound("diskDrop");
 
         hoveringFrom.current = null;
         hoveringDiskId.current = null;
@@ -135,6 +140,7 @@ export function GameKeyboardControls({
     const shakeDisk = useCallback(() => {
         if (hoveringDiskId.current === null) return;
         emit("kb-disk-shake", { diskId: hoveringDiskId.current });
+        playSound("invalidMove");
     }, [emit]);
 
     // Cancel the keyboard hover when the user switches to mouse

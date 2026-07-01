@@ -6,6 +6,7 @@ import { QUALITY } from "../../constants/quality.constants";
 import { useFrame, useThree } from "@react-three/fiber";
 import type { ThreeEvent } from "@react-three/fiber";
 import { usePlasticTextures } from "../../hooks/useSceneTextures";
+import { playSound } from "../../stores/useAudioStore";
 
 const dragPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
 const SNAP_THRESHOLD = 9;
@@ -149,6 +150,7 @@ export default function Disk3d({
             e.stopPropagation();
 
             phase.current = "dragging";
+            playSound("diskPickUp");
 
             const w = screenToWorld(e.nativeEvent.clientX, e.nativeEvent.clientY);
             if (w) dragPos.current.copy(w);
@@ -193,7 +195,10 @@ export default function Disk3d({
                     ];
                     wpIndex.current = 0;
                     phase.current = "animating";
-                    onAnimDone.current = () => onDiskDrop(towerId, nearest);
+                    onAnimDone.current = () => {
+                        playSound("diskDrop");
+                        onDiskDrop(towerId, nearest);
+                    };
                 } else {
                     waypoints.current = [new THREE.Vector3(...targetPosition)];
                     wpIndex.current = 0;

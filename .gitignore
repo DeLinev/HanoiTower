@@ -6,6 +6,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+attributions.txt
 
 node_modules
 dist
@@ -28,4 +29,6 @@ storybook-static
 
 # Public directory — track texture assets, ignore the rest
 public/*
+public/audio/*.wav
 !public/textures/
+!public/audio/

@@ -4,6 +4,7 @@ import { useGameValidation } from "./useGameValidation";
 import { useTimer } from "./useTimer";
 import { useTowerSelection } from "./useTowerSelection";
 import { useGameStateStore } from "../stores/useGameStateStore";
+import { playSound } from "../stores/useAudioStore";
 
 export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: number, timePassed: number, remainingTime: number | null, isGameWon: boolean) => void) {
     const diskCount = difficulty.disks;
@@ -17,6 +18,7 @@ export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: num
     const resetGameState = useGameStateStore(state => state.resetGame);
     
     const handleTimeUp = useCallback(() => {
+        playSound("timeUp");
         onGameComplete?.(gameState.movesCount, difficulty.timeLimit!, 0, false);
     }, [onGameComplete, difficulty.timeLimit, gameState.movesCount]);
 
@@ -46,6 +48,7 @@ export function useGame(difficulty: Difficulty, onGameComplete: (movesCount: num
         if (isWon) {
             setGameWon();
             timer.pause();
+            playSound("victory");
             onGameComplete?.(gameState.movesCount + 1, timer.timePassed, timer.timeRemaining, true);
         }
     }, [gameState.towers, gameState.movesCount, moveDisk, setGameWon, timer, onGameComplete, validation, diskCount]);
