@@ -158,6 +158,13 @@ export function GameKeyboardControls({
     }, [isGameActive, cancelHover]);
 
     useEffect(() => {
+        if (gameState.movesCount === 0 && hoveringFrom.current !== null) {
+            hoveringFrom.current = null;
+            hoveringDiskId.current = null;
+        }
+    }, [gameState.movesCount]);
+
+    useEffect(() => {
         const handleKey = (e: KeyboardEvent) => {
             if (!activeRef.current) return;
             const tag = (e.target as HTMLElement)?.tagName;

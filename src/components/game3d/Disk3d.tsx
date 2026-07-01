@@ -51,9 +51,11 @@ export default function Disk3d({
     const { camera, gl } = useThree();
 
     useEffect(() => {
-        // Only update idle target when we're at rest — prevents mid-animation teleporting
-        if (phase.current === "idle") {
-            idleTarget.current.set(...targetPosition);
+        idleTarget.current.set(...targetPosition);
+        // A targetPosition change during hover means the store moved this disk
+        // externally (game reset). The hover is now stale — snap to idle.
+        if (phase.current === "hovering" || phase.current === "shaking") {
+            phase.current = "idle";
         }
     }, [targetPosition]);
 
