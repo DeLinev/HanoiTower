@@ -55,5 +55,9 @@
     "vite": "^7.1.7",
     "vitest": "^4.0.18"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "allowScripts": {
+    "@tailwindcss/oxide@4.1.13": true,
+    "esbuild@0.27.4": true
+  }
 }
